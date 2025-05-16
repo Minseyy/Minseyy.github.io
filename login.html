@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Login Page</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width = device - width, initial - scale =1.0">
+    <link rel="stylesheet" href="login.css">
+    
+</head>
+
+<body>
+    <div class="login-container">
+        
+        <div class="logo-container">
+            <img src="img/Logo (2).png" alt="MyBudget Logo" class="logo">
+          </div>
+
+        <h2>Login</h2>
+        <form id ="login-form">
+            <label for="username">Email</label>
+            <input type="email" id="email" name="username" placeholder="Enter your email" required>
+
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" placeholder="Enter your password" required>
+            
+            <div class="remember-forgot">
+                <div style="text-align: left;">
+                    <input type="checkbox" id="remember-me" name="remember-me" checked="checked">
+                    <label for="remember-me">Remember Me</label>
+                </div>
+                <div style="text-align: end;">
+                    <a href="forgot.html" class="forgot">Forgot password?</a>
+                </div>
+            </div>
+            
+            <button type="submit">Login</button>
+
+            <div class="third-party-container">
+                <div class="hori-line">
+                    <span>or</span>
+                </div>
+                    <div class="third-party">
+                        <button onclick="window.location.href='/auth/google'"><img src="img/google.png"></button>
+                        <button onclick="window.location.href='/auth/facebook'"><img src="img/fb.png"></button>
+                        <button onclick="window.location.href='/auth/apple'"><img src="img/apple.png"></button>
+                    </div>
+            </div>
+            <p class="sign-up">Not a member? <a href="sign-up.html">Sign up now</a></p>
+        </form>
+    </div>
+</body>
+
+<script src="script.js"></script>
+</html>

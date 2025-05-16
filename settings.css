@@ -1,0 +1,270 @@
+/* Body styling */
+body {
+    background: linear-gradient(to bottom right, #d0cefc, #4063f2);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    color: #333;
+    overflow: auto; /* Allow vertical scrolling */
+    font-family: Monospace;
+    font-size: medium;
+    flex-wrap: wrap;
+  }
+  
+  /* Modal container styling */
+  .modal {
+    position: relative;
+    width: 95%;
+    height: 95%;
+    background: #fff;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    max-height: 100%;
+    overflow: hidden;
+  }
+  
+  /* Close button styling */
+  .close {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #333;
+    cursor: pointer;
+    transition: color 0.3s ease;
+  }
+  
+  .close:hover {
+    color: #7840f2;
+  }
+  
+  /* Modal title styling */
+  .modal h3 {
+    margin: 0;
+    font-size: 1.8em;
+    font-weight: 600;
+    color: #333;
+    display: flex;
+    align-items: center;
+    padding: 20px;
+    border-bottom: 1px solid #ddd;
+    background-color: #f7f7f7;
+  }
+  
+  .modal-content img {
+    width: 24px;
+    height: auto;
+    margin-right: 10px;
+  }
+  
+  /* Modal body styling */
+  .modal-body {
+    display: flex;
+    flex: 1;
+    
+  }
+  
+  /* Left bar styling */
+  .left-bar {
+    flex: 1;
+    background-color: #d4caf4;
+    padding: 20px;
+    color: #333;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    height: 95%;
+  }
+  
+  .left-bar ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    flex-grow: 1; /* Make the list take up available vertical space */
+  }
+  
+  .left-bar ul li {
+    margin: 10px 0;
+    font-size: 1.2em;
+    cursor: pointer;
+    padding: 10px;
+    border-radius: 6px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    display: flex;
+  }
+  
+  .left-bar ul li:hover {
+    background-color: #b3a0e3;
+    color: #fff;
+  }
+  
+  .log-out {
+    padding: 10px; 
+    bottom: 10px; /* Distance from the bottom of the modal */
+    font-weight: bold;
+    color: #7840f2;
+    cursor: pointer;
+    padding-top: 98%;
+  }
+  
+  .log-out:hover {
+    text-decoration: underline;
+  }  
+  
+  /* Right side styling */
+  .right-side {
+    flex: 2;
+    background-color: #fff;
+    padding: 20px;
+   
+  }
+  
+  /* Circle styling */
+  .circle {
+    width: 100px;
+    height: 100px;
+    border: 2px solid #333;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+    background-color: #f9f9f9;
+  }
+  
+  /* Personal info content */
+  .personal-info-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+  }
+  
+  .personal-info-content p {
+    width: 100%;
+    text-align: left;
+    padding: 5px 0;
+  }
+  
+  .switch {
+    margin-top: 5px;
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 28px;
+    margin-left: auto;
+    text-align: right;
+  }
+  
+  .switch input { 
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+  
+  .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    -webkit-transition: .4s;
+    transition: .4s;
+    border-radius: 28px;
+  }
+  
+  .slider:before {
+    position: absolute;
+    content: "";
+    height: 20px;
+    width: 20px;
+    left: 2px;
+    bottom: 4px;
+    background-color: white;
+    -webkit-transition: .4s;
+    transition: .4s;
+    border-radius: 50px;
+  }
+  
+  
+  /* Checked state for toggle */
+  input:checked + .slider {
+    background-color: #7840f2;
+  }
+  
+  input:checked + .slider:before {
+    transform: translateX(26px);
+  }
+  
+  /* Notification container */
+.notification-content {
+  display: flex; /* Use flexbox for aligning the contents */
+  margin-top: 20px;
+  border-radius: 6px;
+  flex-direction: column;
+  font-size: 1.2em;
+}
+
+.notification-content h5 {
+  font-weight: 550;
+  font-size:large;
+}
+
+.notif-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+
+.des {
+  font-size: small;
+  font-style: italic;
+  margin-top: -20px; /* Spacing between h5 and p */
+  font-size: 0.6em; /* Slightly smaller font size */
+  color: #666; /* Optional: Subtle color for description text */
+  padding-left: 2px;
+
+}
+
+.content{
+  display: flex;
+  flex-direction: column;
+}
+
+.notif-preference{
+  font-size: small;
+  padding: 0 10px;
+  padding-left: 1%;
+}
+
+.subheader {
+  font-weight: 300;
+  padding-left: 1%;
+  margin-bottom: 10px;
+  font-size:medium;
+  color: #7840f2;
+  text-decoration: underline;
+  font-style: italic;
+}
+
+.notif-pref {
+  display: flex; /* Arrange text and checkbox in a row */
+  align-items: center; /* Vertically align text and checkbox */
+  margin: 0 0 8px 0; /* Add spacing between rows */
+}
+
+.notif-pref input[type="checkbox"] {
+  margin-left: auto; /* Push the checkbox to the far right */
+}
+
+.menu-container {
+  position: relative;
+}

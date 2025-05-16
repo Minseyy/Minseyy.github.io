@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>MyBudget</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <link rel="stylesheet" href="main.css" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=OpenSans:400,700,800" />
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="img/icons.png">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+</head>
+<body>
+     
+
+    <!-- Top Navigation Bar -->
+    <div class="top-nav-bar">
+        <div class="nav-options">
+            <!-- Hamburger Menu -->
+             <div class="menu-container">
+                <div class="hamburger-menu" id="hamburger-menu">
+                    <div class="line"></div>
+                    <div class="line"></div>
+                    <div class="line"></div>
+                </div>
+                <!-- Sidebar -->
+                <div id="sidebar" class="sidebar">
+                    <ul>
+                        <li><a href="index.html" class="nav-option">Home</a></li>
+                        <li><a href="wallet.html" class="nav-option">Wallet</a></li>
+                        <li><a href="expenses.html" class="nav-option">Expenses</a></li>
+                        <li><a href="savings.html" class="nav-option">Savings</a></li>
+                    </ul>
+                </div>
+
+            </div>
+
+            <!-- Home Button -->
+            <a class="nav-option" href="index.html" id="home-btn">
+                <img src="img/signature.png" alt="Home Icon" class="nav-icon">
+                <span class="tooltip">Home</span>
+            </a>
+
+            <!-- Right Navigation Options -->
+            <div class="nav-options-right">
+                <a href="settings.html" id="settings-btn" class="nav-option">
+                    <img src="img/settings.png" alt="Settings Icon">
+                    <span class="tooltip">Settings</span>
+                </a>
+                
+                <div class="profile-container">
+                    <a href="#" id="login-btn" class="nav-option">
+                        <img src="img/user.png" alt="User Icon">
+                    </a>
+                
+                    <div id="profile-panel" class="modal">
+                        <h3>Profile</h3>
+                        <div class="in-line">
+                            <div class="circle"><img src="img/ning 1.jpg"></div>
+                            <label class="Username">Username: </label>
+                            <input type="text">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
+
+
+        <div class="dashboard">
+            <h1>Budget Overview</h1>
+            <div class="summary content">
+            <canvas id="myChart"></canvas>
+            <div class="summary-text">
+                <div class="summary">
+                    <div>Total Income: <span id="incomeTotal">0</span></div>
+                    <div>Total Expenses: <span id="expenseTotal">0</span></div>
+                    <div>Net Savings: <span id="savingTotal">0</span></div>
+                </div>
+            </div>
+        </div>
+        </div>
+   
+    
+    <div class="box-container">
+        <a href="wallet.html" class="dashboard-link">
+            <div class="wallet-content dashboard box">
+                <h2>Wallet</h2>
+                <p>Expected:</p>
+                <p>Actual:</p>
+                <p>Balance:</p>
+            </div>
+        </a>
+
+        <a href="savings.html" class="dashboard-link">
+            <div class="savings-content dashboard box">
+                <h2>Savings Progress</h2>
+                    <p>Total savings: <span id="savingTotal">0</span></p>
+                    <p></p>
+                    <div id="myProgress">
+                        <div id="myBar"><span class="percentage"></span></div>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <a href="expenses.html" class="dashboard-link">
+        <div class="dashboard">
+            <h2>Expenses</h2>
+            <div class="expense-container">
+                <canvas id="myDonutChart"></canvas>
+                <div class="expenses content">
+                    <p>Total Expenses: <span id="expenseTotal">$0</span></p>
+                    <p>Recent Transactions</p>
+                    <table id="transactions-table">
+                        <tr>
+                            <th>Date</th>
+                            <th>Category</th>
+                            <th>Amount</th>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </a>
+
+    <!-- Footer -->
+    <footer class="footer-banner">
+        <div class="footer-content">
+            <p>&copy; 2025 MyBudget. All rights reserved.</p>
+            <div class="footer-links">
+                <a href="privacy.html">Privacy Policy</a>
+                <a href="terms.html">Terms of Service</a>
+                <a href="contact.html">Contact Us</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+    let myBarChart;
+
+    // Ensure the script runs only after the HTML content is fully loaded
+    document.addEventListener("DOMContentLoaded", function () {
+        const incomeKey = "incomes"; // Key for local storage
+        let transactions = JSON.parse(localStorage.getItem('transactions')) || [];
+        let incomes = JSON.parse(localStorage.getItem(incomeKey)) || []; // Load incomes
+
+
+        // Function to calculate income & expenses totals
+        function getIncomeExpenses() {
+            let incomeTotal = 0, expenseTotal = 0;
+
+            // Calculate total expenses
+            transactions.forEach(txn => {
+                expenseTotal += parseFloat(txn.amount); // Ensure amount is a number
+            });
+
+            // Calculate total income
+            incomes.forEach(income => {
+                incomeTotal += parseFloat(income.amount); // Ensure amount is a number
+            });
+
+            savings.forEach(deposit => {
+                savingTotal += parseFloat(deposit.amount);
+            });
+            
+            return { incomeTotal, expenseTotal, savingTotal };
+        }
+
+        // Function to update total expenses in the HTML
+        function updateTotalExpenses() {
+            const { expenseTotal } = getIncomeExpenses();
+            const expenseElements = document.querySelectorAll("#expenseTotal");
+            expenseElements.forEach(el => {
+                el.textContent = `$${expenseTotal.toFixed(2)}`;
+            });
+            calculateSavings();
+        }
+
+        function updateTotalIncome() {
+            const { incomeTotal } = getIncomeExpenses();
+            const incomeElements = document.querySelectorAll("#incomeTotal");
+            incomeElements.forEach(el => {
+                el.textContent = `$${incomeTotal.toFixed(2)}`;
+            });
+            calculateSavings();
+        }
+
+        function updateTotalSavings() {
+            const { savingTotal } = getIncomeExpenses();
+            const incomeElements = document.querySelectorAll("#incomeTotal");
+            incomeElements.forEach(el => {
+                el.textContent = `$${incomeTotal.toFixed(2)}`;
+            });
+            calculateSavings();
+        }
+
+
+        function updateIncomeExpenses() {
+            const { incomeTotal } = getIncomeExpenses();
+            const incomeElements = document.querySelectorAll("#incomeTotal");
+            expenseElements.forEach(el => {
+                el.textContent = `$${incomeTotal.toFixed(2)}`;
+            });
+        }
+
+        // Function to update the bar chart dynamically
+        function updateChart() {
+            const { incomeTotal, expenseTotal } = getIncomeExpenses();
+            myBarChart.data.datasets[0].data[1] = incomeTotal; // Update income for "This Month"
+            myBarChart.data.datasets[1].data[1] = expenseTotal; // Update expenses for "This Month"
+            myBarChart.update(); // Refresh the chart
+        }
+
+        // Initialize bar chart
+        const ctxBar = document.getElementById('myChart').getContext('2d');
+        myBarChart = new Chart(ctxBar, {
+            type: 'bar',
+            data: {
+                labels: ['This Month'],
+                datasets: [
+                    {
+                        label: 'Income',
+                        data: [getIncomeExpenses().incomeTotal], // Initial data
+                        backgroundColor: 'rgba(54, 162, 235, 0.6)', 
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1
+                    },
+                    {
+                        label: 'Expenses',
+                        data: [getIncomeExpenses().expenseTotal], // Initial data
+                        backgroundColor: 'rgba(255, 99, 132, 0.6)', 
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        borderWidth: 1
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // Initialize donut chart
+        const ctx = document.getElementById('myDonutChart').getContext('2d');
+        const categories = ['Groceries', 'Rent and Bills', 'Supplies', 'Entertainment', 'Eat Out', 'Others'];
+        const chartData = new Array(categories.length).fill(0);
+
+        transactions.forEach(txn => {
+            const categoryIndex = categories.indexOf(txn.category);
+            if (categoryIndex !== -1) {
+                chartData[categoryIndex] += txn.amount;
+            }
+        });
+
+        const myDonutChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: categories,
+                datasets: [{
+                    label: 'Expenses by Category',
+                    data: chartData,
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(54, 162, 235, 0.2)',
+                        'rgba(255, 206, 86, 0.2)',
+                        'rgba(75, 192, 192, 0.2)',
+                        'rgba(153, 102, 255, 0.2)',
+                        'rgba(255, 159, 64, 0.2)',
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)',
+                        'rgba(255, 159, 64, 1)',
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                aspectRatio: 1,
+                plugins: {
+                    legend: { position: 'top' },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed !== null) {
+                                    label += `$${context.parsed.toFixed(2)}`;
+                                }
+                                return label;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Load recent transactions into the table
+        const transactionTable = document.getElementById("transactions-table");
+        transactions.slice(-5).reverse().forEach(transaction => {
+            const row = transactionTable.insertRow(-1);
+            row.innerHTML = `
+                <td>${transaction.date}</td>
+                <td>${transaction.category}</td>
+                <td>$${transaction.amount}</td>
+            `;
+        });
+
+        // Update total expenses and chart on page load
+        updateTotalExpenses();
+        updateTotalIncome();
+        updateChart(); // Call this to update the chart with loaded data
+    });
+
+    function calculateSavings() {
+        const incomeTotal = parseFloat(document.querySelector("#incomeTotal").textContent.replace(/[$,]/g, '')) || 0;
+        const expenseTotal = parseFloat(document.querySelector("#expenseTotal").textContent.replace(/[$,]/g, '')) || 0;
+        document.querySelector("#savingTotal").textContent = `$${(incomeTotal - expenseTotal).toFixed(2)}`;
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+    updateTotalSavings();
+});
+
+function updateTotalSavings() {
+    let deposits = JSON.parse(localStorage.getItem("deposit")) || [];
+    let totalSavings = deposits.reduce((sum, deposit) => sum + parseFloat(deposit.amount), 0);
+
+    document.querySelectorAll("#savingTotal").forEach(el => {
+    el.textContent = `$${savingTotal.toFixed(2)}`;
+});
+
+}
+
+
+
+    </script>
+</body>
+    <script src="script.js"></script>
+</html>

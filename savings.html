@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Savings Page</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="main.css" />
+    <link rel="stylesheet" href="transaction.css" />
+    
+</head>
+
+<style>
+body {
+    height: 100vh;
+    margin: 0;
+}
+
+#SavingsLineChart {
+    background-color: #ffffff;
+    align-items: center;
+    
+}
+
+.dashboard {
+    max-width: 800px;
+    height:min-content;
+    
+}
+
+.right-sidebar {
+    flex: 1; /* Takes less space */
+    width: 200px;
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    height: auto;
+    margin: 10px auto;
+    
+}
+
+.right-sidebar p {
+    font-weight: 100;
+    font-size: 12px;
+}
+
+.right-sidebar label {
+    font-size: 12px;
+    font-weight: 120;
+    font-style: italic;
+    font-family: "Dancing Script";
+}
+
+.container {
+    display: flex;
+    justify-content: space-between; /* Space between main and sidebar */
+    width: 90%;
+    max-width: 1000px;
+    margin: auto;
+}
+
+.main-content {
+    flex: 3; /* Takes more space */
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+
+.heading{
+    text-align: center;
+    margin: 20px;
+    font-family: 'Courier New', Courier, monospace;
+    color: #ffffff;
+}
+
+.colored-box {
+    border: 2px dashed #000;
+    background: none;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: clamp(150px, 80%, 200px); /* Responsive width */
+    gap: 5px;
+    margin: 10px;
+    margin-right: 20px;
+    margin-left: 20px;
+    justify-content: center;
+}
+
+.colored-box input {
+    width: 90%; /* Adjust width dynamically */
+    font-size: 12px;
+    padding: 5px;
+    text-align: center;
+}
+
+.colored-box button {
+    font-size: 10px;
+    padding: 5px;
+    width: 60%;
+}
+
+/* Ensure it stays positioned properly inside the right sidebar */
+.right-sidebar {
+    display: flex;
+    justify-content: flex-end; /* Keep it aligned to the right */
+    padding-right: 20px; /* Maintain consistent spacing */
+}
+
+.goals-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Ensures inner content is centered */
+    width: 100%;
+    gap: 10px;
+    justify-content: center;
+}
+
+</style>
+<body>
+
+     <!-- Top Navigation Bar -->
+     <div class="top-nav-bar">
+        <div class="nav-options">
+            <!-- Hamburger Menu -->
+             <div class="menu-container">
+                <div class="hamburger-menu" id="hamburger-menu">
+                    <div class="line"></div>
+                    <div class="line"></div>
+                    <div class="line"></div>
+                </div>
+                <!-- Sidebar -->
+                <div id="sidebar" class="sidebar">
+                    <ul>
+                        <li><a href="index.html" class="nav-option">Home</a></li>
+                        <li><a href="#wallet" class="nav-option">Wallet</a></li>
+                        <li><a href="#transaction" class="nav-option">Expenses</a></li>
+                        <li><a href="#saving" class="nav-option">Savings</a></li>
+                        <li><a href="#summary" class="nav-option">Summary</a></li>
+                    </ul>
+                </div>
+
+            </div>
+
+            <!-- Home Button -->
+            <a class="nav-option" href="index.html" id="home-btn">
+                <img src="img/signature.png" alt="Home Icon" class="nav-icon">
+                <span class="tooltip">Home</span>
+            </a>
+
+            <!-- Right Navigation Options -->
+            <div class="nav-options-right">
+                <a href="settings.html" id="settings-btn" class="nav-option">
+                    <img src="img/settings.png" alt="Settings Icon">
+                    <span class="tooltip">Settings</span>
+                </a>
+                
+                <div class="profile-container">
+                    <a href="#" id="login-btn" class="nav-option">
+                        <img src="img/user.png" alt="User Icon">
+                    </a>
+                
+                    <div id="profile-panel" class="modal">
+                        <h3>Profile</h3>
+                        <div class="in-line">
+                            <div class="circle"><img src="img/ning 1.jpg"></div>
+                            <label class="Username">Username: </label>
+                            <input type="text">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h1 class="heading">Savings and goals</h1>
+    <div class="container">
+        <!-- Main Content and Left Dashboard -->
+        <div class="main-content">
+            <div class="dashboard">
+                <h1>Savings</h1>
+                <canvas id="SavingsLineChart"></canvas>
+            </div>
+
+            <div class="dashboard deposit">
+                <h2>Deposit: <span id="total-deposit">$0.00</span></h2>
+                <div class="add-container">
+                    <button id="AddData" href><img src="img/add.png" class="add"></button>
+                </div>
+                    <table style="width: 80%; border-collapse: collapse; text-align: center; padding: 10px;" >
+                        <tr>
+                            <th>Date</th>
+                            <th>Amount</th>
+                            <th>Action</th>
+                        </tr>
+                    </table>
+            </div>
+        </div>
+
+        <div id="add-modal" class="add-modal">
+            <div class="add-modal-content">
+                <span class="close">&times;</span>
+                <h2>Add Deposit</h2>
+                <label for="deposit-date">Date:</label>
+                <input type="date" id="deposit-date" class="input" required>
+        
+                <label for="deposit-amount">Amount:</label>
+                <input type="number" class="input" id="deposit-amount" placeholder="$ 0.00" required>
+        
+                <button id="save-deposit">Save</button>
+            </div>
+        </div>
+        
+
+        <!-- Right Sidebar (New Dashboard) -->
+        <div class="right-sidebar">
+            <h2>Goals:<span id="total-goal">$0.00</span</h2>
+            <p>Current savings: <span id="total-deposit">$0.00</span> </p>
+            <p>To save: <span id="to-save">$0.00</span></p>
+            
+            <div class="goals-box">
+                <div class="colored-box">
+                    <label>Goal</label>
+                    <input type="text" id="goal-name">
+                    <label>Amount</label>
+                    <input type="number" id="goal-amount" placeholder="$ 0.00">
+                    <button id="save-goal">Save Goal</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    
+
+    <footer class="footer-banner">
+        <div class="footer-content">
+            <p>&copy; 2025 MyBudget. All rights reserved.</p>
+            <div class="footer-links">
+                <a href="privacy.html">Privacy Policy</a>
+                <a href="terms.html">Terms of Service</a>
+                <a href="contact.html">Contact Us</a>
+            </div>
+        </div>
+    </footer>
+</body>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const labels = ['Jan', 'Feb', 'March', 'April', 'May', 'June', 
+                        'July', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    
+        function getDeposits() {
+            return JSON.parse(localStorage.getItem("deposit")) || [];
+        }
+    
+        function getMonthlyDeposits() {
+            let monthlyTotals = new Array(12).fill(0);
+            getDeposits().forEach(({ date, amount }) => {
+                const monthIndex = new Date(date).getMonth();
+                monthlyTotals[monthIndex] += parseFloat(amount);
+            });
+            return monthlyTotals;
+        }
+    
+        function getTotalDeposit() {
+            return getDeposits().reduce((sum, { amount }) => sum + parseFloat(amount), 0);
+        }
+    
+        function updateTotalDeposit() {
+            document.getElementById("total-deposit").textContent = `$${getTotalDeposit().toFixed(2)}`;
+        }
+    
+        let ctx = document.getElementById('SavingsLineChart').getContext('2d');
+        let myLineChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Deposit Amount',
+                    data: getMonthlyDeposits(),
+                    borderColor: 'blue',
+                    borderWidth: 2,
+                    fill: false,
+                }],
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    x: { title: { display: true, text: 'Months', font: { size: 20, weight: 'bold', family: 'Arial' }, color: 'darkblue' } },
+                    y: { title: { display: true, text: 'Amount ($)', font: { size: 20, weight: 'bold', family: 'Arial' }, color: 'darkblue' }, beginAtZero: true }
+                }
+            }
+        });
+    
+        function updateChart() {
+            myLineChart.data.datasets[0].data = getMonthlyDeposits();
+            myLineChart.update();
+            updateTotalDeposit();
+        }
+    
+        document.getElementById("save-deposit").addEventListener("click", function () {
+            setTimeout(updateChart, 100);
+        });
+    
+        updateChart();
+    });
+    </script>
+    
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const addButton = document.getElementById("AddData");
+        const modal = document.getElementById("add-modal");
+        const closeModal = document.querySelector(".close");
+        const saveButton = document.getElementById("save-deposit");
+        const depositDate = document.getElementById("deposit-date");
+        const depositAmount = document.getElementById("deposit-amount");
+        const table = document.querySelector(".dashboard.deposit table");
+    
+        // Open modal
+        addButton.addEventListener("click", function () {
+            modal.style.display = "block";
+        });
+    
+        // Close modal
+        closeModal.addEventListener("click", function () {
+            modal.style.display = "none";
+        });
+    
+        // Save deposit
+        saveButton.addEventListener("click", function () {
+            const date = depositDate.value;
+            const amount = parseFloat(depositAmount.value).toFixed(2);
+    
+            if (!date || isNaN(amount)) return;
+    
+            const deposits = JSON.parse(localStorage.getItem("deposit")) || [];
+            deposits.push({ date, amount });
+            localStorage.setItem("deposit", JSON.stringify(deposits));
+    
+            addDepositToTable(date, amount);
+            depositDate.value = "";
+            depositAmount.value = "";
+            modal.style.display = "none";
+        });
+    
+        // Function to add a row to the table
+        function addDepositToTable(date, amount) {
+            const row = table.insertRow(-1);
+            row.innerHTML = `
+                <td>${date}</td>
+                <td>$${amount}</td>
+                <td><button class="delete-btn">Delete</button></td>
+            `;
+    
+            // Delete functionality
+            row.querySelector(".delete-btn").addEventListener("click", function () {
+                row.remove();
+                removeDeposit(date, amount);
+            });
+        }
+    
+        // Remove deposit from localStorage
+        function removeDeposit(date, amount) {
+            let deposits = JSON.parse(localStorage.getItem("deposit")) || [];
+            deposits = deposits.filter(d => !(d.date === date && d.amount === amount));
+            localStorage.setItem("deposit", JSON.stringify(deposits));
+        }
+    
+        // Load existing deposits on page load
+        function loadDeposits() {
+            const deposits = JSON.parse(localStorage.getItem("deposit")) || [];
+            deposits.forEach(({ date, amount }) => addDepositToTable(date, amount));
+        }
+    
+        loadDeposits();
+
+        function calculateSavingsLeft() {
+        const goal = parseFloat(document.querySelector("#total-goal").textContent.replace(/[$,]/g, '')) || 0;
+        const curr_savings = parseFloat(document.querySelector("total-deposit").textContent.replace(/[$,]/g, '')) || 0;
+        document.querySelector("#to-save").textContent = `$${(goal-curr_savings).toFixed(2)}`;
+    }
+
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+    const saveButton = document.getElementById("save-goal");
+    const goalNameInput = document.getElementById("goal-name");
+    const goalAmountInput = document.getElementById("goal-amount");
+    const goalsBox = document.querySelector(".goals-box");
+
+    let totalGoal = 0; // Track total goal amount
+
+    saveButton.addEventListener("click", function () {
+        let goalName = goalNameInput.value.trim();
+        let goalAmount = parseFloat(goalAmountInput.value) || 0;
+
+        if (!goalName || goalAmount <= 0) {
+            alert("Please enter a valid goal name and amount.");
+            return;
+        }
+
+        // Check if we are editing an existing goal
+        if (saveButton.textContent === "Edit Goal") {
+            const existingGoal = document.querySelector(".goal-entry");
+            existingGoal.querySelector(".goal-name").textContent = goalName;
+            existingGoal.querySelector(".goal-amount").textContent = `$ ${goalAmount.toFixed(2)}`;
+        } else {
+            // Create new goal entry
+            const goalEntry = document.createElement("div");
+            goalEntry.classList.add("goal-entry");
+            goalEntry.innerHTML = `
+                <p><strong class="goal-name">${goalName}</strong></p>
+                <p>Amount: <span class="goal-amount">$ ${goalAmount.toFixed(2)}</span></p>
+            `;
+
+            goalsBox.appendChild(goalEntry);
+            totalGoal += goalAmount;
+        }
+
+        // Change button to "Edit Goal"
+        saveButton.textContent = "Edit Goal";
+    });
+});
+
+
+
+
+    </script>
+    
+
+
+
+</html>

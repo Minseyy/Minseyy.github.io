@@ -1,0 +1,548 @@
+/* Reset default margins, padding, and enable consistent box-sizing */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Set global styles for the body */
+body {
+  background-color: #d0cefc;
+  font-family: Monospace;
+  
+}
+
+/* Prevent horizontal scrolling */
+body, html {
+  overflow-x: hidden;
+  width: 100%;
+  height: 100%;
+}
+
+
+/* Dashboard heading alignment */
+.dashboard h1 {
+  text-align: center;
+}
+
+/* Top navigation bar styles */
+.top-nav-bar {
+  height: 80px;
+  display: flex;
+  align-items: center; /* Vertically aligns items */
+  justify-content: center; /* Center content */
+  background-color: #d0cefc; /* Muted blue with transparency */
+  color: black;
+  padding: 0 2rem; /* Side padding */
+  border-radius: 10px; /* Rounded corners */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+  position: sticky; /* Sticky positioning */
+  top: 0;
+  z-index: 9999;
+}
+
+/*Home button*/
+#home-btn img{
+  margin-top: 10px;
+  width: 15rem;
+  height: auto;
+  display: block;
+}
+/* Navigation options container */
+.nav-options {
+  display: flex;
+  justify-content: space-between; /* Distribute items evenly */
+  align-items: center; /* Align items vertically */
+  width: 100%;
+  max-width: 100%; /* Restrict maximum width */
+  margin-top: 0px;
+}
+
+/* Individual navigation option styling */
+.nav-option {
+  position: relative;
+  display: inline-block;
+  text-decoration: none;
+  color: black;
+  font-size: 1rem;
+  transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+/* Navigation option icon styling */
+.nav-option img {
+  width: 24px;
+  height: auto;
+  display: block;
+}
+
+/* Tooltip styling */
+.nav-option .tooltip {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(10px); /* Initially offset */
+  color: black;
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-size: 0.9rem;
+  white-space: nowrap;
+  opacity: 0; /* Hidden by default */
+  visibility: hidden;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+/* Show tooltip on hover */
+.nav-option:hover .tooltip {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0); /* Move to final position */
+}
+
+/* Dashboard content container */
+.dashboard {
+  width: 90%; /* Keeps a consistent margin on small screens */
+  max-width: 800px;
+  margin: 10px auto;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 1rem; /* Adds inner spacing */
+}
+
+.dashboard:hover {
+  background-color: #fcf8ff;
+}
+@media (max-width: 600px) { /* Adjust for very small screens */
+  .dashboard {
+    width: 95%; /* Reduces width slightly to keep margins */
+  }
+}
+
+/* Hamburger menu styling */
+.hamburger-menu {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 25px;
+  height: 20px;
+  cursor: pointer;
+  transition: all 0.5s ease; /* Smooth transition for hover */
+}
+
+.hamburger-menu .line {
+  width: 70%;
+  height: 2px;
+  background-color: #464646;
+  border-radius: 5px;
+  transition: 0.3s;
+}
+
+/* Hero section styling */
+.hero {
+  text-align: center;
+  padding: 2rem;
+  background: linear-gradient(to bottom, #d0cefc, #4063f2);
+  color: white;
+}
+
+.text-container {
+  flex: 1;
+  padding: 1rem;
+}
+
+.des {
+  font-size: 0.8rem;
+  line-height: 1.6;
+  font-style: italic;
+}
+
+.logo {
+  max-width: 40%;
+  height: auto;
+  object-fit: contain;
+}
+
+.logo-container {
+  flex: 1;
+  text-align: center;
+}
+
+/* Close button for modal */
+.close {
+  color: #aaa;
+  float: right;
+  font-size: 48px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.close:hover,
+.close:focus {
+  color: black;
+  text-decoration: none;
+}
+
+/* Form label styling */
+label {
+  display: block;
+  margin: 1rem 0 0.5rem;
+  font-weight: bold;
+}
+
+/* Input field styling */
+input {
+  width: 90%;
+  padding: 0.8rem;
+  margin-bottom: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+
+.close {
+  position: absolute;
+  top: 5px;
+  right: 15px;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.top-nav-bar button {
+  background: none;
+  border: none;
+}
+
+.nav-options-right {
+  display: flex;
+  gap: 1rem; /* Space between icons */
+}
+/* Sidebar Styles */
+.sidebar {
+  width: 200px;
+  height: 100vh;
+  background: #d0cefc;
+  color: white;
+  position: fixed;
+  left: -200px;
+  top: 0;
+  transition: left 0.3s ease;
+  padding: 20px;
+  box-shadow: 2px 0px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* Sidebar expands on hover */
+.menu-container:hover .sidebar,
+.sidebar:hover {
+  left: 0;
+}
+
+/* Sidebar list styles */
+.sidebar ul {
+  margin-top: 1.5rem;
+  list-style: none;
+  padding: 0;
+}
+
+.sidebar ul li {
+  padding: 1rem 0;
+}
+
+.sidebar ul li a {
+  text-decoration: none;
+  color: white;
+  font-size: 1.2rem;
+  display: block;
+  transition: color 0.3s;
+}
+
+.sidebar ul li a:hover {
+  color: #d0cefc;
+  text-decoration: underline;
+}
+
+
+/* Hamburger menu styling */
+.hamburger-menu {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 30px;
+  height: 20px;
+  cursor: pointer;
+  transition: all 0.3s ease; /* Smooth transition for hover */
+}
+
+[data-logged-in="true"] {
+  display: none; /* Hide private content by default */
+}
+
+[data-logged-in="false"] {
+  display: block; /* Show public content by default */
+}
+
+/*Footer design*/
+.footer-banner {
+  width: 100%;
+  background: linear-gradient(to top, #4063f2, #d0cefc);  /*Gradient background */
+  color: white; /* White text */
+  padding: 3rem 1rem; /* Spacing inside the footer */
+  text-align: center; /* Center the text */
+  position: relative; /* To ensure it's a banner-style element */
+}
+
+.footer-content {
+  max-width: 1200px; /* Limit content width */
+  margin: 0 auto; /* Center the content horizontally */
+}
+
+.footer-content h2 {
+  font-size: 2rem; /* Larger heading */
+  margin-bottom: 1rem; /* Spacing below the heading */
+  font-family: 'Quicksand', sans-serif; /* Consistent font */
+}
+
+.footer-content p {
+  font-size: 0.9rem; /* Smaller font for copyright text */
+  margin-bottom: 1.5rem;
+}
+
+.footer-links a {
+  margin: 0 1rem; /* Space between links */
+  text-decoration: none; /* Remove underline */
+  color: #ffffff; /* White text for links */
+  font-weight: bold;
+  font-size: 1rem;
+}
+
+.footer-links a:hover {
+  color: #ffd700; /* Highlight color on hover */
+  text-decoration: underline; /* Add underline on hover */
+}
+
+.menu-container {
+  position: relative;
+}
+
+#myChart {
+  max-width: 500px !important;
+  height: auto !important;
+  flex: 1;
+}
+
+.content {
+  display: flex;
+  flex: 1;
+  flex-wrap: wrap;
+  gap: 20px;
+  padding: 10px;
+}
+
+.h1 {
+  text-align: center;
+  margin: 10px 0;
+}
+
+.box-container {
+  display: flex;
+  justify-content: center; /* Center boxes horizontally */
+  gap: 15px; /* Space between the boxes */
+  width: 90%; /* Same width as the dashboard */
+  max-width: 800px; /* Ensures the container doesn’t stretch beyond dashboard width */
+  margin: 10px auto; /* Centers the container */
+}
+
+.box {
+  flex: 1 1 300px;
+  min-width: 200px; /* Minimum width to prevent them from being too small */
+  min-height: 200px; 
+  width: 90%;
+  gap: 10px;
+
+}
+
+#myDonutChart { 
+  max-width: 250px;
+  height: auto !important;
+  flex: 1;
+  flex-shrink: 0;
+  float: left;
+  width: 50%;
+}
+
+/*parent container recognizes the 
+floated child elements and adjusts its 
+height accordingly. (CLEAR FIX METHOD)*/
+
+.expense-container::after {
+  content: "";
+  display: block;
+  clear: both;
+}
+
+#myProgress {
+  width: 100%;
+  background-color: #ddd;
+  display:flex;
+  text-align: center;
+  margin-top: 5%;
+  border-radius: 15px;
+}
+
+#myBar {
+  width: 0%; /* Starts empty */
+  height: 30px;
+  background-color: #7fffd0;
+  display:flex;
+  text-align: center;
+  align-items: center;
+  border-radius: 15px;
+  position: relative;
+  transition: width 0.5s ease-in-out; /* Smooth animation */
+}
+
+.percentage {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-weight: bold;
+  color: black;
+}
+
+
+.dashboard-link {
+  text-decoration: none; /* Removes the underline */
+  color: inherit; /* Keeps text color unchanged */
+}
+
+.dashboard-link:hover {
+  opacity: 0.8; /* Adds a hover effect */
+}
+
+.dashboard-link:visited {
+  color: inherit; /* Ensures the color does not change */
+}
+
+/* Ensure that the box inside the link behaves like a block element */
+a.dashboard-link {
+  display: inline-block;  /* Allow the box to behave normally but still be clickable */
+  text-decoration: none;  /* Remove underline from the link */
+  width: 100%;  /* Ensure anchor takes the full width */
+}
+
+/* Prevent click or pointer interactions with the wrapping <a> tag affecting layout */
+a.dashboard-link .box {
+  pointer-events: none;  /* Prevent the box inside from triggering the link */
+  width: 100%;  /* Ensure the box takes full width of its container */
+  height: auto; /* Let the height adjust based on content */
+}
+
+/* Optionally: Allow clicks on box items to still function if needed */
+a.dashboard-link .box:hover {
+  cursor: pointer;  /* Ensure pointer shows when hovering over the box */
+}
+
+.modal {
+  position: absolute;
+  top: 50px; /* Adjust position */
+  left: 50%;
+  transform: translateX(-50%);
+  background: white;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+  display: none; /* Hide by default */
+}
+
+/* Ensure modal appears when hovering over container */
+.profile-container:hover .modal {
+  display: block;
+}
+
+/* Ensure container has relative positioning */
+.profile-container {
+  position: relative;
+  display: inline-block;
+}.modal {
+  position: absolute;
+  top: 50px; /* Adjust position */
+  left: 50%;
+  transform: translateX(-50%);
+  background: white;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+  display: none; /* Hide by default */
+}
+
+/* Ensure modal appears when hovering over container */
+.profile-container:hover .modal {
+  display: block;
+}
+
+/* Ensure container has relative positioning */
+.profile-container {
+  position: relative;
+  display: inline-block;
+
+}
+
+/* Style for the modal */
+.modal {
+  position: absolute;
+  top: 40px; /* Adjust vertical position */
+  left: -70px; /* Move modal to the left */
+  width: 200px; /* Set width */
+  min-height: 100px; /* Set shorter height */
+  background: white;
+  padding: 10px;
+  border-radius: 8px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+  display: none; /* Hide by default */
+  text-align: center;
+
+}
+
+/* Ensure modal appears when hovering over container */
+.profile-container:hover .modal {
+  display: block;
+}
+
+/* Ensure container has relative positioning */
+.profile-container {
+  position: relative;
+  display: inline-block;
+}
+
+.circle {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.circle img{
+  width: 100px;
+  height: 100px;
+  border: 1px solid #333;
+  border-radius: 50%;
+  margin: 10px 0;
+  background-color: #f9f9f9;
+  
+}
+
+.profile-panel {
+  align-items: center;
+  text-align: center;
+  display: flex;
+}
+
+/* Flexbox for inline layout */
+.in-line {
+  align-items: center; /* Vertically align elements */
+  gap: 10px; /* Space between elements */
+  width: 100%;
+  
+}
+

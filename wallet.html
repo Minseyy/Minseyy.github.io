@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Wallet Page</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="main.css" />
+    <link rel="stylesheet" href="transaction.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script&family=Pacifico&family=Great+Vibes&family=Lobster&display=swap" rel="stylesheet">
+</head>
+
+<style>
+body {
+    height: 100vh;
+    margin: 0;
+}
+
+#SavingsLineChart {
+    background-color: #ffffff;
+    align-items: center;
+}
+
+.dashboard {
+    max-width: 800px;
+}
+
+.right-sidebar {
+    flex: 1; /* Takes less space */
+    width: 200px;
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    height: auto;
+    margin: 10px auto;
+}
+
+.container {
+    display: flex;
+    justify-content: space-between; /* Space between main and sidebar */
+    width: 90%;
+    max-width: 1000px;
+    margin: auto;
+}
+
+.main-content {
+    flex: 3; /* Takes more space */
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.wallet-content {
+    margin-bottom: 50px;
+    height:fit-content;
+    width:fit-content;
+}
+
+.heading{
+    text-align: center;
+    margin: 20px;
+    font-family: 'Courier New', Courier, monospace;
+    color: #ffffff;
+}
+
+h2 {
+    text-align: center;
+}
+
+table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: auto;
+        }
+        th, td {
+            border: 1px solid rgba(0, 0, 0, 0.16);
+            padding: 10px;
+            text-align: center;
+        }
+
+</style>
+<body>
+
+     <!-- Top Navigation Bar -->
+     <div class="top-nav-bar">
+        <div class="nav-options">
+            <!-- Hamburger Menu -->
+             <div class="menu-container">
+                <div class="hamburger-menu" id="hamburger-menu">
+                    <div class="line"></div>
+                    <div class="line"></div>
+                    <div class="line"></div>
+                </div>
+                <!-- Sidebar -->
+                <div id="sidebar" class="sidebar">
+                    <ul>
+                        <li><a href="index.html" class="nav-option">Home</a></li>
+                        <li><a href="#wallet" class="nav-option">Wallet</a></li>
+                        <li><a href="#transaction" class="nav-option">Expenses</a></li>
+                        <li><a href="#saving" class="nav-option">Savings</a></li>
+                        <li><a href="#summary" class="nav-option">Summary</a></li>
+                    </ul>
+                </div>
+
+            </div>
+
+            <!-- Home Button -->
+            <a class="nav-option" href="index.html" id="home-btn">
+                <img src="img/signature.png" alt="Home Icon" class="nav-icon">
+                <span class="tooltip">Home</span>
+            </a>
+
+            <!-- Right Navigation Options -->
+            <div class="nav-options-right">
+                <a href="settings.html" id="settings-btn" class="nav-option">
+                    <img src="img/settings.png" alt="Settings Icon">
+                    <span class="tooltip">Settings</span>
+                </a>
+                
+                <div class="profile-container">
+                    <a href="#" id="login-btn" class="nav-option">
+                        <img src="img/user.png" alt="User Icon">
+                    </a>
+                
+                    <div id="profile-panel" class="modal">
+                        <h3>Profile</h3>
+                        <div class="in-line">
+                            <div class="circle"><img src="img/ning 1.jpg"></div>
+                            <label class="Username">Username: </label>
+                            <input type="text">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h1 class="heading">Wallet</h1>
+        <div class="wallet-content dashboard">
+            <table>
+                <tr>
+                    <th>Allowance</th>
+                    <td><input type="number" class="num1" oninput="calculateBalance(this)" min="0" step="0.01"></td>
+                </tr>
+
+                <tr>
+                    <th>Ammount Spent</th>
+                    <td><input type="number" class="num2" oninput="calculateBalance(this)" min="0" step="0.01" ></td>
+                </tr>
+
+                <tr>
+                    <th>Balance</th>
+                    <td class="balance">0</td>
+                </tr>
+
+            </table>
+        </div>
+
+        <div class="income-content dashboard">
+            <h2>Income</h2>
+            <div class="add-container">
+                <button id="AddData" href><img src="img/add.png" class="add"></button>
+            </div>
+                <table>
+                    <tr>
+                        <th>Date</th>
+                        <th>Amount</th>
+                        <th>Action</th>
+                    </tr>
+                </table>
+    </div>
+
+    <div id="add-modal" class="add-modal">
+        <div class="add-modal-content">
+            <span class="close">&times;</span>
+            <h2>Add Income</h2>
+            <label for="income-date">Date:</label>
+            <input type="date" id="income-date" class="input" required>
+    
+            <label for="income-amount">Amount:</label>
+            <input type="number" class="input" id="income-amount" placeholder="$ 0.00" required>
+    
+            <button id="save-income">Save</button>
+        </div>
+    </div>
+
+    <footer class="footer-banner">
+        <div class="footer-content">
+            <p>&copy; 2025 MyBudget. All rights reserved.</p>
+            <div class="footer-links">
+                <a href="privacy.html">Privacy Policy</a>
+                <a href="terms.html">Terms of Service</a>
+                <a href="contact.html">Contact Us</a>
+            </div>
+        </div>
+    </footer>
+</body>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+    const incomeKey = "incomes";
+    const modal = document.getElementById("add-modal");
+    const addDataBtn = document.getElementById("AddData");
+    const closeModalBtn = document.querySelector(".close");
+    const saveIncomeBtn = document.getElementById("save-income");
+    
+    function getInputValue(selector, defaultValue = 0) {
+        return parseFloat(document.querySelector(selector).value) || defaultValue;
+    }
+    
+    function calculateBalance() {
+        document.querySelector(".balance").textContent = getInputValue(".num1") - getInputValue(".num2");
+    }
+
+    function saveIncomes(incomes) {
+        localStorage.setItem(incomeKey, JSON.stringify(incomes));
+    }
+
+    function loadIncomes() {
+        const incomes = JSON.parse(localStorage.getItem(incomeKey)) || [];
+        incomes.forEach(addIncomeToTable);
+        updateTotals(incomes);
+    }
+
+    function updateTotals(incomes) {
+        const totalIncome = incomes.reduce((sum, income) => sum + parseFloat(income.amount), 0);
+        document.querySelector(".income-content h2").textContent = `Income: $${totalIncome.toFixed(2)}`;
+    }
+
+    function addIncomeToTable(income) {
+        const table = document.querySelector(".income-content table");
+        const newRow = table.insertRow();
+        newRow.innerHTML = `
+            <td>${income.date}</td>
+            <td>$${parseFloat(income.amount).toFixed(2)}</td>
+            <td>
+                <button class="modify-btn">Modify</button>
+                <button class="delete-btn">Delete</button>
+            </td>
+        `;
+
+        newRow.querySelector(".modify-btn").addEventListener("click", () => modifyIncome(income, newRow));
+        newRow.querySelector(".delete-btn").addEventListener("click", () => deleteIncome(income, newRow));
+    }
+
+    function modifyIncome(income, row) {
+        document.getElementById("income-date").value = income.date;
+        document.getElementById("income-amount").value = income.amount;
+        modal.style.display = "block";
+        deleteIncome(income, row);
+    }
+
+    function deleteIncome(income, row) {
+        row.remove();
+        let incomes = JSON.parse(localStorage.getItem(incomeKey)) || [];
+        incomes = incomes.filter(i => i.date !== income.date || i.amount !== income.amount);
+        saveIncomes(incomes);
+        updateTotals(incomes);
+    }
+
+    async function saveIncome() {
+        const date = document.getElementById("income-date").value;
+        const amount = parseFloat(document.getElementById("income-amount").value);
+
+        if (!date || isNaN(amount)) {
+            alert("Please enter valid income details.");
+            return;
+        }
+
+        const income = { date, amount };
+
+        try {
+            const response = await fetch("http://localhost:3000/api/transactions", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(income),
+            });
+
+            if (response.ok) {
+                alert("Income added!");
+                const incomes = JSON.parse(localStorage.getItem(incomeKey)) || [];
+                incomes.push(income);
+                saveIncomes(incomes);
+                addIncomeToTable(income);
+                updateTotals(incomes);
+                modal.style.display = "none";
+            } else {
+                alert("Failed to add income. See console for details.");
+            }
+        } catch (error) {
+            console.error("Error:", error);
+            alert("Error saving income. Check console.");
+        }
+    }
+
+    function toggleModal(show) {
+        modal.style.display = show ? "block" : "none";
+    }
+
+    addDataBtn.addEventListener("click", () => toggleModal(true));
+    closeModalBtn.addEventListener("click", () => toggleModal(false));
+    window.addEventListener("click", event => {
+        if (event.target === modal) toggleModal(false);
+    });
+    saveIncomeBtn.addEventListener("click", saveIncome);
+
+    loadIncomes();
+});
+
+</script>
+</html>

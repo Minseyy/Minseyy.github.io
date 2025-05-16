@@ -1,0 +1,174 @@
+
+body {
+    height: 100vh;
+    margin: 0;
+}
+
+
+#myDonutChart {
+    width: 100%;  /* Adjust width as needed, using percentage or pixel values */
+    height: 900px;  /* Set your desired height, e.g., 400px or more */
+    max-width: 1200px;  /* Optional: Limit maximum width */
+    margin: 2rem;
+}
+
+.heading{
+    text-align: center;
+    margin: 10px;
+    font-family: 'Courier New', Courier, monospace;
+    color: #ffffff;
+}
+
+.top-nav-bar {
+    z-index: 500;
+}
+
+.box-container {
+    display: flex;
+    justify-content: center; /* Centers items horizontally */
+    gap: 20px;
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 20px;
+}
+
+.dashboard {
+    max-width: 1600px;
+    
+}
+
+
+#AddData {
+    position: block;
+}
+
+.add{
+    width: 13px;
+    display: flex;
+    text-align: end;
+}
+
+.add-container {
+    text-align: right;
+}
+.add-modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: none;
+  background-color: rgba(0,0,0,0.5);
+}
+
+.add-modal h2 {
+    text-align: center;
+    margin: 1rem 0;
+    font-family: 'Dancing Script', cursive;
+    font-weight: 1000;
+    font-size: 35px;
+    color: #7840f2;
+}
+
+
+
+#save-transaction {
+    width: 50%; /* Adjust width as needed */
+    padding: 10px;
+    text-align: center;
+    background-color: #7840f2;
+    color: white;
+    border: none;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.add-modal-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Centers all items inside the modal */
+    position: relative;  /* Ensures absolute positioning works inside */
+    background-color: white;
+    margin: 10% auto;
+    padding: 20px;
+    border-radius: 10px;
+    width: 50%;
+    box-shadow: 0px 0px 10px gray;
+}
+
+.close {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  font-size: 24px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.close:hover {
+  color: red;
+}
+
+#save-transaction {
+    text-align: center;
+    align-items: center;
+    margin: 20px 0;
+    border-radius: 5px;
+}
+#save-transaction:hover {
+  background-color: #4c05e4;
+}
+
+/* Responsive Design */
+@media screen and (max-width: 600px) {
+  .add-modal-content {
+    width: 90%;
+  }
+}
+
+.input {
+    width: 80%;
+    margin: 10px 0;
+}
+
+.transaction {
+    background-color: #f8f9fa;  /* Light background color for the section */
+    border-radius: 10px;  /* Rounded corners */
+    padding: 20px;  /* Spacing inside the box */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);  /* Light shadow for depth */
+    width: 100%;
+    max-width: 600px;  /* Optional: set a max-width */
+    margin: 20px auto;  /* Center the section horizontally */
+    text-align: center;  /* Center the text */
+}
+
+.transaction > p:first-child {
+    font-size: 1rem;  /* Larger font for total label */
+    color: #333;  /* Dark text color */
+    font-weight: bold;  /* Bold text */
+}
+
+.transaction p:last-child {
+    font-size: 0.8rem;  /* Slightly smaller text for category breakdown */
+    color: #555;  /* Lighter text color */
+}
+
+.transaction .category-total {
+    font-weight: normal;  /* Non-bold text for category totals */
+    margin-bottom: 10px;  /* Space between items */
+}
+
+.transaction .category-total span {
+    font-weight: bold;  /* Make amounts bold */
+    color: #007bff;  /* Blue color for the amounts */
+}
+
+/* Optional: Style for the "Total Expenses" section as a card with hover effect */
+.transaction:hover {
+    background-color: #f1f3f5;  /* Change background on hover */
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.1);  /* Darker shadow */
+    cursor: pointer;  /* Pointer cursor to indicate interaction */
+}
+

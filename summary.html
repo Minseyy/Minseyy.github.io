@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Summary Page</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="main.css" />
+    
+</head>
+
+<style>
+body {
+    height: 100vh;
+    margin: 0;
+}
+
+#SavingsLineChart {
+    background-color: #ffffff;
+    align-items: center;
+    
+}
+
+.dashboard {
+    max-width: 800px;
+    height:min-content;
+    
+}
+
+.right-sidebar {
+    flex: 1; /* Takes less space */
+    width: 200px;
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    height: auto;
+    margin: 10px auto;
+}
+
+.container {
+    display: flex;
+    justify-content: space-between; /* Space between main and sidebar */
+    width: 90%;
+    max-width: 1000px;
+    margin: auto;
+}
+
+.main-content {
+    flex: 3; /* Takes more space */
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+
+.heading{
+    text-align: center;
+    margin: 20px;
+    font-family: 'Courier New', Courier, monospace;
+    color: #ffffff;
+}
+
+</style>
+<body>
+
+     <!-- Top Navigation Bar -->
+     <div class="top-nav-bar">
+        <div class="nav-options">
+            <!-- Hamburger Menu -->
+             <div class="menu-container">
+                <div class="hamburger-menu" id="hamburger-menu">
+                    <div class="line"></div>
+                    <div class="line"></div>
+                    <div class="line"></div>
+                </div>
+                <!-- Sidebar -->
+                <div id="sidebar" class="sidebar">
+                    <ul>
+                        <li><a href="index.html" class="nav-option">Home</a></li>
+                        <li><a href="#wallet" class="nav-option">Wallet</a></li>
+                        <li><a href="#transaction" class="nav-option">Expenses</a></li>
+                        <li><a href="#saving" class="nav-option">Savings</a></li>
+                        <li><a href="#summary" class="nav-option">Summary</a></li>
+                    </ul>
+                </div>
+
+            </div>
+
+            <!-- Home Button -->
+            <a class="nav-option" href="index.html" id="home-btn">
+                <img src="img/signature.png" alt="Home Icon" class="nav-icon">
+                <span class="tooltip">Home</span>
+            </a>
+
+            <!-- Right Navigation Options -->
+            <div class="nav-options-right">
+                <a href="settings.html" id="settings-btn" class="nav-option">
+                    <img src="img/settings.png" alt="Settings Icon">
+                    <span class="tooltip">Settings</span>
+                </a>
+                
+                <div class="profile-container">
+                    <a href="#" id="login-btn" class="nav-option">
+                        <img src="img/user.png" alt="User Icon">
+                    </a>
+                
+                    <div id="profile-panel" class="modal">
+                        <h3>Profile</h3>
+                        <div class="in-line">
+                            <div class="circle"><img src="img/ning 1.jpg"></div>
+                            <label class="Username">Username: </label>
+                            <input type="text">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h1 class="heading">Summary</h1>
+    <div class="dashboard">
+        <div class="summary content">
+            <canvas id="myChart"></canvas>
+            <div class="summary-text">
+                <div class="summary">
+                    <div>Total Income: $<span id="income-total">0</span></div>
+                    <div>Total Expenses: $<span id="expense-total">0</span></div>
+                    <div>Net Savings: $<span id="savings-total">0</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer-banner">
+        <div class="footer-content">
+            <p>&copy; 2025 MyBudget. All rights reserved.</p>
+            <div class="footer-links">
+                <a href="privacy.html">Privacy Policy</a>
+                <a href="terms.html">Terms of Service</a>
+                <a href="contact.html">Contact Us</a>
+            </div>
+        </div>
+    </footer>
+</body>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const ctx = document.getElementById('myChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Last Month', 'This Month'],
+                datasets: [
+                {
+                    label: 'Income',
+                    data: [5000, 6000],
+                    backgroundColor: 'rgba(54, 162, 235, 0.6)', // Blue
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                },
+                {
+                    label: 'Expenses',
+                    data: [3000, 3200],
+                    backgroundColor: 'rgba(255, 99, 132, 0.6)', // Red
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    borderWidth: 1
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    });
+</script>
+</html>

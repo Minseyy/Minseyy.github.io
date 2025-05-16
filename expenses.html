@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Expenses Page</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="main.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script&family=Pacifico&family=Great+Vibes&family=Lobster&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+    <link rel="stylesheet" href="transaction.css" />
+</head>
+
+<style>
+    
+table {
+
+margin: auto;
+
+th, td {
+    padding: 10px;
+    font-weight: lighter;
+    border-left: 1px solid black;
+    border-right: 1px solid black;
+    
+}
+
+th {
+    border: 1px solid black;
+}
+
+tr:not(:first-child) td {
+    border-top: none;
+    
+}
+
+tr:is(:last-child) td {
+    border-bottom: 1px solid black;
+}
+
+
+}
+</style>
+
+<body>
+
+     <!-- Top Navigation Bar -->
+     <div class="top-nav-bar">
+        <div class="nav-options">
+            <!-- Hamburger Menu -->
+             <div class="menu-container">
+                <div class="hamburger-menu" id="hamburger-menu">
+                    <div class="line"></div>
+                    <div class="line"></div>
+                    <div class="line"></div>
+                </div>
+                <!-- Sidebar -->
+                <div id="sidebar" class="sidebar">
+                    <ul>
+                        <li><a href="index.html" class="nav-option">Home</a></li>
+                        <li><a href="wallet.html" class="nav-option">Wallet</a></li>
+                        <li><a href="expenses.html" class="nav-option">Expenses</a></li>
+                        <li><a href="savings.html" class="nav-option">Savings</a></li>
+                    </ul>
+                </div>
+
+            </div>
+
+            <!-- Home Button -->
+            <a class="nav-option" href="index.html" id="home-btn">
+                <img src="img/signature.png" alt="Home Icon" class="nav-icon">
+                <span class="tooltip">Home</span>
+            </a>
+
+            <!-- Right Navigation Options -->
+            <div class="nav-options-right">
+                <a href="settings.html" id="settings-btn" class="nav-option">
+                    <img src="img/settings.png" alt="Settings Icon">
+                    <span class="tooltip">Settings</span>
+                </a>
+                
+                <a href="profile.html" id="login-btn" class="nav-option">
+                    <img src="img/user.png" alt="User Icon">
+                    <span class="tooltip">Profile</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <h1 class="heading">Expenses</h1>
+    <div class="box-container">
+        <div class="dashboard">
+            <h1>Expenses  Category</h1>
+            <div class="expense-container">
+                <canvas id="myDonutChart"></canvas>  
+            </div>
+        </div>
+
+        <div class="transaction dashboard">
+            <p>Total Expenses:</p>
+            <p>Total for each category</p>
+        </div>
+    </div>
+
+    <div class="dashboard">
+        <h1>Recent Transactions</h1>
+        <div class="add-container">
+            <button id="AddData" href><img src="img/add.png" class="add"></button>
+        </div>
+            <table style="width: 80%; border-collapse: collapse; text-align: center; padding: 10px;" >
+                <tr>
+                    <th>Date</th>
+                    <th>Category</th>
+                    <th>Amount</th>
+                    <th>Action</th>
+                </tr>
+            </table>
+    </div>
+    
+    <div id="add-modal" class="add-modal">
+        <div class="add-modal-content">
+            <span class="close">&times;</span>
+            <h2>Add Transaction</h2>
+            <label for="transaction-date">Date:</label>
+            <input type="date" id="transaction-date" class="input" required>
+    
+            <label for="transaction-category">Category:</label>
+            <select id="transaction-category" class="input">
+                <option value="" disabled selected>Select a category</option>
+                <option value="Groceries">Groceries</option>
+                <option value="Rent and Bills">Rent and Bills</option>
+                <option value="Supplies">Supplies</option>
+                <option value="Entertainment">Entertainment</option>
+                <option value="Eat Out">Eat Out</option>
+                <option value="Others">Others</option>
+            </select>
+
+
+            <!-- Input for custom category (hidden by default) -->
+            <input type="text" id="custom-category" placeholder="Enter other category" style="display: none;">
+
+    
+            <label for="transaction-amount">Amount:</label>
+            <input type="number" class="input" id="transaction-amount" placeholder="$ 0.00" required>
+    
+            <button id="save-transaction">Save</button>
+        </div>
+    </div>
+    
+    
+    <footer class="footer-banner">
+        <div class="footer-content">
+            <p>&copy; 2025 MyBudget. All rights reserved.</p>
+            <div class="footer-links">
+                <a href="privacy.html">Privacy Policy</a>
+                <a href="terms.html">Terms of Service</a>
+                <a href="contact.html">Contact Us</a>
+            </div>
+        </div>
+    </footer>
+</body>
+
+<script>
+    const transactionKey = 'transactions'; // Key for localStorage
+const ctx = document.getElementById('myDonutChart').getContext('2d');
+
+// Initial Chart Data
+const categories = ['Groceries', 'Rent and Bills', 'Supplies', 'Entertainment', 'Eat Out','Others'];
+const chartData = [0, 0, 0, 0, 0];  // Initial data (values for each category)
+const myDonutChart = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+        labels: categories,
+        datasets: [{
+            label: 'Expenses by Category',
+            data: chartData,
+            backgroundColor: [
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(54, 162, 235, 0.2)',
+                        'rgba(255, 206, 86, 0.2)',
+                        'rgba(75, 192, 192, 0.2)',
+                        'rgba(153, 102, 255, 0.2)',
+                        'rgba(255, 159, 64, 0.2)',
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)',
+                        'rgba(255, 159, 64, 1)',
+                    ],
+            borderWidth: 1
+        }]
+    },
+    options: {
+        responsive: true,
+        aspectRatio: 2,
+        plugins: {
+            legend: {
+                position: 'right',
+            },
+            tooltip: {
+                callbacks: {
+                    label: function(context) {
+                        let label = context.label || '';
+                        if (label) {
+                            label += ': ';
+                        }
+                        if (context.parsed !== null) {
+                            label += "$" + context.parsed.toFixed(2);
+                        }
+                        return label;
+                    }
+                }
+            }
+        }
+    },
+});
+
+// Load transactions from localStorage when the page is loaded
+function loadTransactions() {
+    const savedTransactions = JSON.parse(localStorage.getItem(transactionKey)) || [];
+    savedTransactions.forEach(transaction => {
+        addTransactionToTable(transaction);
+    });
+    updateTotals(savedTransactions);
+}
+
+// Save transactions to localStorage
+function saveTransactions(transactions) {
+    localStorage.setItem(transactionKey, JSON.stringify(transactions));
+}
+
+function updateTotals(transactions) {
+     let totalExpenses = 0;
+     let categoryTotals = { Groceries: 0, "Rent and Bills": 0, Supplies: 0, Entertainment: 0, "Eat Out": 0, Others: 0 };
+
+     transactions.forEach(transaction => {
+         let category = transaction.category;
+         if (!categoryTotals.hasOwnProperty(category)) {
+             category = "Others"; // Any non-listed category goes to "Other"
+         }
+         totalExpenses += parseFloat(transaction.amount);
+         categoryTotals[category] = (categoryTotals[category] || 0) + parseFloat(transaction.amount);
+     });
+
+     // Update the HTML content
+     document.querySelector('.transaction p:first-child').textContent = `Total Expenses: $${totalExpenses.toFixed(2)}`;
+     let categoryHtml = '';
+     for (let category in categoryTotals) {
+         categoryHtml += `<p>${category}: $${categoryTotals[category].toFixed(2)}</p>`;
+     }
+     document.querySelector('.transaction p:last-child').innerHTML = categoryHtml;
+
+     // Update chart data
+     categories.forEach((category, index) => {
+         chartData[index] = categoryTotals[category] || 0;
+     });
+
+     myDonutChart.update();
+ }
+
+
+const predefinedCategories = ["Food", "Transport", "Shopping", "Bills", "Entertainment","Others"];
+
+function processCategory(inputCategory) {
+    // Only return predefined categories, otherwise return the custom category.
+    if (inputCategory === "Others") {
+        let customCategory = document.getElementById("custom-category").value;
+        return customCategory || "Others";  // Use custom category if provided
+    }
+    return predefinedCategories.includes(inputCategory) ? inputCategory : "Others";
+}
+
+function updateChart(transactions) {
+    let categoryTotals = {};
+
+    transactions.forEach(transaction => {
+        let processedCategory = processCategory(transaction.category);
+
+        if (!categoryTotals[processedCategory]) {
+            categoryTotals[processedCategory] = 0;
+        }
+        categoryTotals[processedCategory] += parseFloat(transaction.amount);
+    });
+
+    let chartLabels = Object.keys(categoryTotals);
+    let chartData = chartLabels.map(cat => categoryTotals[cat]);
+
+    let ctx = document.getElementById("donut-chart").getContext("2d");
+
+    if (window.myChart) {
+        window.myChart.destroy();
+    }
+
+    window.myChart = new Chart(ctx, {
+        type: "doughnut",
+        data: {
+            labels: chartLabels, // Includes "Other"
+            datasets: [{
+                data: chartData,
+                backgroundColor: ["#ff6384", "#36a2eb", "#ffce56", "#4bc0c0", "#9966ff", "#aaaaaa"], // Adjust colors
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    display: true,
+                    position: "bottom"
+                }
+            }
+        }
+    });
+}
+
+
+// Add transaction to the table
+function addTransactionToTable(transaction) {
+    let table = document.querySelector("table");
+
+    let newRow = table.insertRow(-1);
+    let dateCell = newRow.insertCell(0);
+    let categoryCell = newRow.insertCell(1);
+    let amountCell = newRow.insertCell(2);
+    let actionCell = newRow.insertCell(3);
+
+    dateCell.textContent = transaction.date;
+    categoryCell.textContent = transaction.category;
+    amountCell.textContent = `$${parseFloat(transaction.amount).toFixed(2)}`;
+
+    // Modify button
+    let modifyBtn = document.createElement("button");
+    modifyBtn.textContent = "Modify";
+    modifyBtn.classList.add("modify-btn");
+    actionCell.appendChild(modifyBtn);
+
+    // Modify button click event
+    modifyBtn.addEventListener("click", function() {
+        document.getElementById("transaction-date").value = transaction.date;
+        document.getElementById("transaction-category").value = transaction.category;
+        document.getElementById("transaction-amount").value = transaction.amount;
+        
+        // Show modal
+        document.getElementById("add-modal").style.display = "block";
+
+        // Remove the old transaction from storage and table
+        deleteTransaction(transaction, newRow);
+    });
+
+    //Delete button
+    let deleteBtn = document.createElement("button");
+    deleteBtn.textContent = "Delete";
+    deleteBtn.classList.add("delete-btn");
+    actionCell.appendChild(deleteBtn);
+
+    deleteBtn.addEventListener("click", function() {
+        newRow.remove();
+        let transactions = JSON.parse(localStorage.getItem(transactionKey)) || [];
+        transactions = transactions.filter(t => t.date !== transaction.date || t.category !== transaction.category || t.amount !== transaction.amount);
+        saveTransactions(transactions);
+        updateTotals(transactions);
+    });
+}
+document.getElementById("save-transaction").addEventListener("click", async function () {
+    const date = document.getElementById("transaction-date").value;
+    const category = document.getElementById("transaction-category").value;
+    const amount = parseFloat(document.getElementById("transaction-amount").value);
+
+    if (!date || !category || isNaN(amount)) {
+        alert("Please enter valid transaction details.");
+        return;
+    }
+
+    const transaction = { date, category, amount };
+
+    try {
+        const response = await fetch("http://localhost:3000/api/transactions", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(transaction),
+        });
+
+        if (response.ok) {
+            alert("Transaction saved!");
+            // Save to local storage
+            const transactions = JSON.parse(localStorage.getItem(transactionKey)) || [];
+            transactions.push(transaction);
+            saveTransactions(transactions); // Save to local storage
+            addTransactionToTable(transaction); // Add to the table
+            updateTotals(transactions); // Update totals
+            modal.style.display = "none"; // Close the modal
+        } else {
+            alert("Failed to save transaction.");
+        }
+    } catch (error) {
+        console.error("Error:", error);
+        alert("Error saving transaction.");
+    }
+});
+
+// Open and close the modal
+var modal = document.getElementById("add-modal");
+var btn = document.getElementById("AddData");
+var span = document.getElementsByClassName("close")[0];
+
+btn.onclick = function() {
+    modal.style.display = "block";
+};
+
+span.onclick = function() {
+    modal.style.display = "none";
+};
+
+window.onclick = function(event) {
+    if (event.target == modal) {
+        modal.style.display = "none";
+    }
+};
+
+document.addEventListener("DOMContentLoaded", function() {
+    loadTransactions();
+    document.querySelectorAll(".delete-btn").forEach(button => {
+        button.addEventListener("click", function() {
+            this.parentElement.parentElement.remove(); // Deletes the row
+        });
+    });
+});
+
+document.getElementById("transaction-category").addEventListener("change", function() {
+    let customCategoryInput = document.getElementById("custom-category");
+    
+    if (this.value === "Others") {
+        customCategoryInput.style.display = "block"; // Show input field
+        customCategoryInput.required = true; // Make it required
+    } else {
+        customCategoryInput.style.display = "none"; // Hide input field
+        customCategoryInput.required = false; // Remove requirement
+        customCategoryInput.value = ""; // Clear input field
+    }
+});
+
+</script>
+</html>

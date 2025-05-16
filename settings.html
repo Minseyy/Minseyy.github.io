@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="settings.css">
+  <style>
+    .content {
+      display: none;
+    }
+
+    .content.active {
+      display: flex;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="myModal" class="modal">
+    <span class="close">&times;</span>
+    <div class="modal-body">
+      <!-- Left Bar -->
+      <div class="left-bar">
+        <div class="modal-content">
+          <h3><img src="img/settings.png" alt="Settings Icon" class="settings-logo">Settings</h3>
+          <ul>
+            <li data-setting="personal-info">Personal Information</li>
+            <li data-setting="notification">Notification</li>
+            <li data-setting="privacy">Privacy</li>
+            <li data-setting="appearance">Appearance</li>
+          </ul>
+          <div class="log-out" id="logOutButton">Log Out</div>
+        </div>
+      </div>
+      
+      <!-- Right Side -->
+      <div class="right-side">
+        <div class="modal-content">
+          <!-- Content Sections -->
+          <div id="personal-info" class="content active personal-info-content">
+            <h4>Profile</h4>
+            <div class="circle"></div>
+            <p>Username: </p>
+            <p>Email: </p>
+            <p>Currency: </p>
+          </div>
+
+          <div id="notification" class="content notification-content">
+            <h4>Notification</h4>
+            <div class="notif-row">
+              <h5>Receive Notification</h5>
+              <label class="switch">
+                <input type="checkbox" checked="checked" />
+                <span class="slider"></span>
+              </label>
+            </div>
+            <p class="des">Notifications will be sent via email.</p>
+              
+                <p class="subheader">Preference</p>
+              <div class="notif-preference">
+                
+                <label class="notif-pref">
+                  Weekly reminder
+                  <input type="checkbox" class="custom-checkbox">
+                  <span class="checkmark"></span>
+                </label>
+
+                <label class="notif-pref">
+                  Monthly reminder
+                  <input type="checkbox" class="custom-checkbox">
+                  <span class="checkmark"></span>
+                </label>
+
+                <label class="notif-pref">
+                  Monthly report
+                  <input type="checkbox" class="custom-checkbox">
+                  <span class="checkmark"></span>
+                </label>
+              </div>
+          </div>
+
+          <div id="privacy" class="content privacy-content">
+            <h4>Privacy</h4>
+            <p>Password Reset</p>
+            <p>Two factor authentication   </p>
+          </div>
+
+          <div id="appearance" class="content">
+            <h4>Appearance</h4>
+            <p>Dark Mode</p>
+            <p>Text Size</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Close button functionality
+    document.querySelector('.close').addEventListener('click', function () {
+      window.location.href = 'index.html'; // Redirect to the home page
+    });
+
+    // Tab functionality
+    document.addEventListener("DOMContentLoaded", () => {
+      const buttons = document.querySelectorAll("[data-setting]");
+      const contents = document.querySelectorAll(".content");
+
+      buttons.forEach((button) => {
+        button.addEventListener("click", () => {
+          // Remove 'active' class from all content sections
+          contents.forEach((content) => content.classList.remove("active"));
+
+          // Add 'active' class to the targeted content
+          const target = button.getAttribute("data-setting");
+          document.getElementById(target).classList.add("active");
+
+          // Optional: Highlight the clicked button
+          buttons.forEach((btn) => btn.classList.remove("active-btn"));
+          button.classList.add("active-btn");
+        });
+      });
+    });
+  </script>
+</body>
+
+</html>
