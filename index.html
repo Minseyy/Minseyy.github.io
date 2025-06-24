@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <title>MyBudget</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    
+
     <link rel="stylesheet" href="main.css" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=OpenSans:400,700,800" />
     <link href="https://fonts.googleapis.com/css2?family=Quicksand&display=swap" rel="stylesheet">
@@ -14,14 +15,15 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 </head>
+
 <body>
-     
+
 
     <!-- Top Navigation Bar -->
     <div class="top-nav-bar">
         <div class="nav-options">
             <!-- Hamburger Menu -->
-             <div class="menu-container">
+            <div class="menu-container">
                 <div class="hamburger-menu" id="hamburger-menu">
                     <div class="line"></div>
                     <div class="line"></div>
@@ -51,12 +53,12 @@
                     <img src="img/settings.png" alt="Settings Icon">
                     <span class="tooltip">Settings</span>
                 </a>
-                
+
                 <div class="profile-container">
                     <a href="#" id="login-btn" class="nav-option">
                         <img src="img/user.png" alt="User Icon">
                     </a>
-                
+
                     <div id="profile-panel" class="modal">
                         <h3>Profile</h3>
                         <div class="in-line">
@@ -70,45 +72,45 @@
         </div>
     </div>
 
-    
 
 
-        <div class="dashboard">
-            <h1>Budget Overview</h1>
-            <div class="summary content">
+
+    <div class="dashboard">
+        <h1>Budget Overview</h1>
+        <div class="summary content">
             <canvas id="myChart"></canvas>
             <div class="summary-text">
                 <div class="summary">
                     <div>Total Income: <span id="incomeTotal">0</span></div>
                     <div>Total Expenses: <span id="expenseTotal">0</span></div>
-                    <div>Net Savings: <span id="savingTotal">0</span></div>
+                    <div>Net Savings: <span id="netSaving">0</span></div>
                 </div>
             </div>
         </div>
-        </div>
-   
-    
+    </div>
+
+
     <div class="box-container">
         <a href="wallet.html" class="dashboard-link">
             <div class="wallet-content dashboard box">
-                <h2>Wallet</h2>
-                <p>Expected:</p>
-                <p>Actual:</p>
-                <p>Balance:</p>
+                <h2>Wallet Overview</h2>
+                <p id="wallet-expected">Expected: $0.00</p>
+                <p id="wallet-actual">Actual: $0.00</p>
+                <p id="wallet-balance">Balance: $0.00</p>
             </div>
         </a>
 
         <a href="savings.html" class="dashboard-link">
             <div class="savings-content dashboard box">
                 <h2>Savings Progress</h2>
-                    <p>Total savings: <span id="savingTotal">0</span></p>
-                    <p></p>
-                    <div id="myProgress">
-                        <div id="myBar"><span class="percentage"></span></div>
-                    </div>
+                <p>Goals: <span id="goalTotal">0</span></p>
+                <p>Total savings: <span id="savingTotal">0</span></p>
+                <p></p>
+                <div id="myProgress">
+                    <div id="myBar"><span class="percentage"></span></div>
                 </div>
-            </a>
-        </div>
+            </div>
+        </a>
     </div>
 
     <a href="expenses.html" class="dashboard-link">
@@ -143,216 +145,230 @@
         </div>
     </footer>
 
-    <script>
-    let myBarChart;
 
-    // Ensure the script runs only after the HTML content is fully loaded
-    document.addEventListener("DOMContentLoaded", function () {
-        const incomeKey = "incomes"; // Key for local storage
-        let transactions = JSON.parse(localStorage.getItem('transactions')) || [];
-        let incomes = JSON.parse(localStorage.getItem(incomeKey)) || []; // Load incomes
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
+        import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-database.js";
 
+        const firebaseConfig = {
+            apiKey: "AIzaSyC_zBxZ7J1tQMUJWGOSB4wVKcFwEtfbZts",
+            authDomain: "mybudget-11d45.firebaseapp.com",
+            projectId: "mybudget-11d45",
+            storageBucket: "mybudget-11d45.appspot.com",
+            messagingSenderId: "883252995975",
+            appId: "1:883252995975:web:d2d87202b428e9e5ed9522",
+            measurementId: "G-6WXSPFE95B"
+        };
 
-        // Function to calculate income & expenses totals
-        function getIncomeExpenses() {
-            let incomeTotal = 0, expenseTotal = 0;
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        let myBarChart;
 
-            // Calculate total expenses
+        document.addEventListener("DOMContentLoaded", async () => {
+            const categories = ['Groceries', 'Rent and Bills', 'Supplies', 'Entertainment', 'Eat Out', 'Others'];
+            const chartData = new Array(categories.length).fill(0);
+
+            // Fetch all data in parallel instead of sequential awaits
+            const [transactions, incomes, deposits, wallet, goals] = await Promise.all([
+                fetchData('transactions'),
+                fetchData('incomes'),
+                fetchData('deposits'),
+                fetchData('wallet'),
+                fetchData('goals'),
+            ]);
+
+            const { incomeTotal, expenseTotal, savingTotal, goalTotal } = getIncomeExpenses(transactions, incomes, deposits, goals);
+
+            updateIncomeTotal(incomeTotal);
+            updateExpenseTotal(expenseTotal);
+            updateSavingTotal(savingTotal);
+            updateNetSavingTotal(incomeTotal - expenseTotal);
+            updateProgressBar(savingTotal, goalTotal);
+            updateWalletDisplay(wallet);
+            updateGoalTotal(goalTotal);
+
             transactions.forEach(txn => {
-                expenseTotal += parseFloat(txn.amount); // Ensure amount is a number
+                const idx = categories.indexOf(txn.category);
+                if (idx !== -1) chartData[idx] += parseFloat(txn.amount);
             });
 
-            // Calculate total income
-            incomes.forEach(income => {
-                incomeTotal += parseFloat(income.amount); // Ensure amount is a number
-            });
+            renderBarChart(incomeTotal, expenseTotal);
+            renderDonutChart(categories, chartData);
+            renderRecentTransactions(transactions);
+        });
 
-            savings.forEach(deposit => {
-                savingTotal += parseFloat(deposit.amount);
-            });
-            
-            return { incomeTotal, expenseTotal, savingTotal };
+
+        async function fetchData(path) {
+            const snapshot = await get(ref(db, path));
+            const data = snapshot.val();
+            if (!data) return path === 'wallet' ? {} : []; // wallet is an object, others arrays
+            return path === 'wallet' ? data : Object.values(data);
         }
 
-        // Function to update total expenses in the HTML
-        function updateTotalExpenses() {
-            const { expenseTotal } = getIncomeExpenses();
-            const expenseElements = document.querySelectorAll("#expenseTotal");
-            expenseElements.forEach(el => {
-                el.textContent = `$${expenseTotal.toFixed(2)}`;
-            });
-            calculateSavings();
+        function getIncomeExpenses(transactions, incomes, savings, goals) {
+            const incomeTotal = incomes.reduce((sum, item) => sum + parseFloat(item.amount), 0);
+            const expenseTotal = transactions.reduce((sum, item) => sum + parseFloat(item.amount), 0);
+            const savingTotal = savings.reduce((sum, item) => sum + parseFloat(item.amount), 0);
+            const goalTotal = goals ? goals.reduce((sum, item) => sum + parseFloat(item.amount), 0) : 0;
+            return { incomeTotal, expenseTotal, savingTotal, goalTotal };
         }
 
-        function updateTotalIncome() {
-            const { incomeTotal } = getIncomeExpenses();
-            const incomeElements = document.querySelectorAll("#incomeTotal");
-            incomeElements.forEach(el => {
-                el.textContent = `$${incomeTotal.toFixed(2)}`;
-            });
-            calculateSavings();
-        }
+        function updateWalletDisplay(wallet) {
+            const expected = parseFloat(wallet.allowance || 0);
+            const actual = parseFloat(wallet.spent || 0);
+            const balance = expected - actual;
 
-        function updateTotalSavings() {
-            const { savingTotal } = getIncomeExpenses();
-            const incomeElements = document.querySelectorAll("#incomeTotal");
-            incomeElements.forEach(el => {
-                el.textContent = `$${incomeTotal.toFixed(2)}`;
-            });
-            calculateSavings();
+            const walletBox = document.querySelector('.wallet-content');
+            if (!walletBox) return; // Safety check
+
+            walletBox.querySelector('p:nth-of-type(1)').textContent = `Expected: $${expected.toFixed(2)}`;
+            walletBox.querySelector('p:nth-of-type(2)').textContent = `Actual: $${actual.toFixed(2)}`;
+            walletBox.querySelector('p:nth-of-type(3)').textContent = `Balance: $${balance.toFixed(2)}`;
         }
 
 
-        function updateIncomeExpenses() {
-            const { incomeTotal } = getIncomeExpenses();
-            const incomeElements = document.querySelectorAll("#incomeTotal");
-            expenseElements.forEach(el => {
-                el.textContent = `$${incomeTotal.toFixed(2)}`;
+        function updateIncomeTotal(total) {
+            document.querySelectorAll("#incomeTotal").forEach(el => {
+                el.textContent = `$${total.toFixed(2)}`;
             });
         }
 
-        // Function to update the bar chart dynamically
-        function updateChart() {
-            const { incomeTotal, expenseTotal } = getIncomeExpenses();
-            myBarChart.data.datasets[0].data[1] = incomeTotal; // Update income for "This Month"
-            myBarChart.data.datasets[1].data[1] = expenseTotal; // Update expenses for "This Month"
-            myBarChart.update(); // Refresh the chart
+        function updateExpenseTotal(total) {
+            document.querySelectorAll("#expenseTotal").forEach(el => {
+                el.textContent = `$${total.toFixed(2)}`;
+            });
         }
 
-        // Initialize bar chart
-        const ctxBar = document.getElementById('myChart').getContext('2d');
-        myBarChart = new Chart(ctxBar, {
-            type: 'bar',
-            data: {
-                labels: ['This Month'],
-                datasets: [
-                    {
-                        label: 'Income',
-                        data: [getIncomeExpenses().incomeTotal], // Initial data
-                        backgroundColor: 'rgba(54, 162, 235, 0.6)', 
-                        borderColor: 'rgba(54, 162, 235, 1)',
-                        borderWidth: 1
-                    },
-                    {
-                        label: 'Expenses',
-                        data: [getIncomeExpenses().expenseTotal], // Initial data
-                        backgroundColor: 'rgba(255, 99, 132, 0.6)', 
-                        borderColor: 'rgba(255, 99, 132, 1)',
-                        borderWidth: 1
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                scales: {
-                    y: {
-                        beginAtZero: true
+        function updateSavingTotal(total) {
+            document.querySelectorAll("#savingTotal").forEach(el => {
+                el.textContent = `$${total.toFixed(2)}`;
+            });
+        }
+
+        function updateNetSavingTotal(netSavingValue) {
+            const netSavingElem = document.getElementById("netSaving");
+            if (netSavingElem) {
+                netSavingElem.textContent = `$${netSavingValue.toFixed(2)}`;
+            }
+        }
+
+        function updateGoalTotal(total) {
+            const goal = document.getElementById("goalTotal");
+            if (goal) {
+                goal.textContent = `$${total.toFixed(2)}`;
+            }
+        }
+
+
+        function updateProgressBar(savingTotal, goalTotal) {
+            const bar = document.getElementById("myBar");
+            if (!goalTotal || goalTotal === 0) {
+                bar.style.width = "0%";
+                bar.querySelector(".percentage").textContent = "0%";
+                return;
+            }
+            const percent = Math.min(100, Math.max(0, (savingTotal / goalTotal) * 100));
+            bar.style.width = percent + "%";
+            bar.querySelector(".percentage").textContent = `${percent.toFixed(0)}%`;
+        }
+
+
+        function renderBarChart(incomeTotal, expenseTotal) {
+            const ctxBar = document.getElementById('myChart').getContext('2d');
+            myBarChart = new Chart(ctxBar, {
+                type: 'bar',
+                data: {
+                    labels: ['This Month'],
+                    datasets: [
+                        {
+                            label: 'Income',
+                            data: [incomeTotal],
+                            backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Expenses',
+                            data: [expenseTotal],
+                            backgroundColor: 'rgba(255, 99, 132, 0.6)',
+                            borderColor: 'rgba(255, 99, 132, 1)',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
                     }
                 }
-            }
-        });
+            });
+        }
 
-        // Initialize donut chart
-        const ctx = document.getElementById('myDonutChart').getContext('2d');
-        const categories = ['Groceries', 'Rent and Bills', 'Supplies', 'Entertainment', 'Eat Out', 'Others'];
-        const chartData = new Array(categories.length).fill(0);
-
-        transactions.forEach(txn => {
-            const categoryIndex = categories.indexOf(txn.category);
-            if (categoryIndex !== -1) {
-                chartData[categoryIndex] += txn.amount;
-            }
-        });
-
-        const myDonutChart = new Chart(ctx, {
-            type: 'doughnut',
-            data: {
-                labels: categories,
-                datasets: [{
-                    label: 'Expenses by Category',
-                    data: chartData,
-                    backgroundColor: [
-                        'rgba(255, 99, 132, 0.2)',
-                        'rgba(54, 162, 235, 0.2)',
-                        'rgba(255, 206, 86, 0.2)',
-                        'rgba(75, 192, 192, 0.2)',
-                        'rgba(153, 102, 255, 0.2)',
-                        'rgba(255, 159, 64, 0.2)',
-                    ],
-                    borderColor: [
-                        'rgba(255, 99, 132, 1)',
-                        'rgba(54, 162, 235, 1)',
-                        'rgba(255, 206, 86, 1)',
-                        'rgba(75, 192, 192, 1)',
-                        'rgba(153, 102, 255, 1)',
-                        'rgba(255, 159, 64, 1)',
-                    ],
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                aspectRatio: 1,
-                plugins: {
-                    legend: { position: 'top' },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                let label = context.label || '';
-                                if (label) {
-                                    label += ': ';
+        function renderDonutChart(labels, data) {
+            const ctx = document.getElementById('myDonutChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Expenses by Category',
+                        data: data,
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.2)',
+                            'rgba(54, 162, 235, 0.2)',
+                            'rgba(255, 206, 86, 0.2)',
+                            'rgba(75, 192, 192, 0.2)',
+                            'rgba(153, 102, 255, 0.2)',
+                            'rgba(255, 159, 64, 0.2)'
+                        ],
+                        borderColor: [
+                            'rgba(255, 99, 132, 1)',
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(255, 206, 86, 1)',
+                            'rgba(75, 192, 192, 1)',
+                            'rgba(153, 102, 255, 1)',
+                            'rgba(255, 159, 64, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    aspectRatio: 1,
+                    plugins: {
+                        legend: { position: 'top' },
+                        tooltip: {
+                            callbacks: {
+                                label: function (context) {
+                                    let label = context.label || '';
+                                    if (label) label += ': ';
+                                    if (context.parsed !== null) label += `$${context.parsed.toFixed(2)}`;
+                                    return label;
                                 }
-                                if (context.parsed !== null) {
-                                    label += `$${context.parsed.toFixed(2)}`;
-                                }
-                                return label;
                             }
                         }
                     }
                 }
-            }
-        });
+            });
+        }
 
-        // Load recent transactions into the table
-        const transactionTable = document.getElementById("transactions-table");
-        transactions.slice(-5).reverse().forEach(transaction => {
-            const row = transactionTable.insertRow(-1);
-            row.innerHTML = `
-                <td>${transaction.date}</td>
-                <td>${transaction.category}</td>
-                <td>$${transaction.amount}</td>
-            `;
-        });
-
-        // Update total expenses and chart on page load
-        updateTotalExpenses();
-        updateTotalIncome();
-        updateChart(); // Call this to update the chart with loaded data
-    });
-
-    function calculateSavings() {
-        const incomeTotal = parseFloat(document.querySelector("#incomeTotal").textContent.replace(/[$,]/g, '')) || 0;
-        const expenseTotal = parseFloat(document.querySelector("#expenseTotal").textContent.replace(/[$,]/g, '')) || 0;
-        document.querySelector("#savingTotal").textContent = `$${(incomeTotal - expenseTotal).toFixed(2)}`;
-    }
-
-    document.addEventListener("DOMContentLoaded", function () {
-    updateTotalSavings();
-});
-
-function updateTotalSavings() {
-    let deposits = JSON.parse(localStorage.getItem("deposit")) || [];
-    let totalSavings = deposits.reduce((sum, deposit) => sum + parseFloat(deposit.amount), 0);
-
-    document.querySelectorAll("#savingTotal").forEach(el => {
-    el.textContent = `$${savingTotal.toFixed(2)}`;
-});
-
-}
-
-
+        function renderRecentTransactions(transactions) {
+            const table = document.getElementById("transactions-table");
+            transactions.slice(-5).reverse().forEach(txn => {
+                const row = table.insertRow(-1);
+                row.innerHTML = `
+        <td>${txn.date}</td>
+        <td>${txn.category}</td>
+        <td>$${parseFloat(txn.amount).toFixed(2)}</td>
+      `;
+            });
+        }
 
     </script>
 </body>
-    <script src="script.js"></script>
+<script src="script.js"></script>
+
 </html>
