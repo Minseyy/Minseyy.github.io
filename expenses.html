@@ -1,54 +1,57 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <title>Expenses Page</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="main.css" />
-    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script&family=Pacifico&family=Great+Vibes&family=Lobster&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Dancing+Script&family=Pacifico&family=Great+Vibes&family=Lobster&display=swap"
+        rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
     <link rel="stylesheet" href="transaction.css" />
 </head>
 
 <style>
-    
-table {
+    table {
 
-margin: auto;
+        margin: auto;
 
-th, td {
-    padding: 10px;
-    font-weight: lighter;
-    border-left: 1px solid black;
-    border-right: 1px solid black;
-    
-}
+        th,
+        td {
+            padding: 10px;
+            font-weight: lighter;
+            border-left: 1px solid black;
+            border-right: 1px solid black;
 
-th {
-    border: 1px solid black;
-}
+        }
 
-tr:not(:first-child) td {
-    border-top: none;
-    
-}
+        th {
+            border: 1px solid black;
+        }
 
-tr:is(:last-child) td {
-    border-bottom: 1px solid black;
-}
+        tr:not(:first-child) td {
+            border-top: none;
+
+        }
+
+        tr:is(:last-child) td {
+            border-bottom: 1px solid black;
+        }
 
 
-}
+    }
 </style>
 
 <body>
 
-     <!-- Top Navigation Bar -->
-     <div class="top-nav-bar">
+    <!-- Top Navigation Bar -->
+    <div class="top-nav-bar">
         <div class="nav-options">
             <!-- Hamburger Menu -->
-             <div class="menu-container">
+            <div class="menu-container">
                 <div class="hamburger-menu" id="hamburger-menu">
                     <div class="line"></div>
                     <div class="line"></div>
@@ -78,7 +81,7 @@ tr:is(:last-child) td {
                     <img src="img/settings.png" alt="Settings Icon">
                     <span class="tooltip">Settings</span>
                 </a>
-                
+
                 <a href="profile.html" id="login-btn" class="nav-option">
                     <img src="img/user.png" alt="User Icon">
                     <span class="tooltip">Profile</span>
@@ -90,9 +93,9 @@ tr:is(:last-child) td {
     <h1 class="heading">Expenses</h1>
     <div class="box-container">
         <div class="dashboard">
-            <h1>Expenses  Category</h1>
+            <h1>Expenses Category</h1>
             <div class="expense-container">
-                <canvas id="myDonutChart"></canvas>  
+                <canvas id="myDonutChart"></canvas>
             </div>
         </div>
 
@@ -107,23 +110,23 @@ tr:is(:last-child) td {
         <div class="add-container">
             <button id="AddData" href><img src="img/add.png" class="add"></button>
         </div>
-            <table style="width: 80%; border-collapse: collapse; text-align: center; padding: 10px;" >
-                <tr>
-                    <th>Date</th>
-                    <th>Category</th>
-                    <th>Amount</th>
-                    <th>Action</th>
-                </tr>
-            </table>
+        <table style="width: 80%; border-collapse: collapse; text-align: center; padding: 10px;">
+            <tr>
+                <th>Date</th>
+                <th>Category</th>
+                <th>Amount</th>
+                <th>Action</th>
+            </tr>
+        </table>
     </div>
-    
+
     <div id="add-modal" class="add-modal">
         <div class="add-modal-content">
             <span class="close">&times;</span>
             <h2>Add Transaction</h2>
             <label for="transaction-date">Date:</label>
             <input type="date" id="transaction-date" class="input" required>
-    
+
             <label for="transaction-category">Category:</label>
             <select id="transaction-category" class="input">
                 <option value="" disabled selected>Select a category</option>
@@ -139,15 +142,15 @@ tr:is(:last-child) td {
             <!-- Input for custom category (hidden by default) -->
             <input type="text" id="custom-category" placeholder="Enter other category" style="display: none;">
 
-    
+
             <label for="transaction-amount">Amount:</label>
             <input type="number" class="input" id="transaction-amount" placeholder="$ 0.00" required>
-    
+
             <button id="save-transaction">Save</button>
         </div>
     </div>
-    
-    
+
+
     <footer class="footer-banner">
         <div class="footer-content">
             <p>&copy; 2025 MyBudget. All rights reserved.</p>
@@ -158,23 +161,42 @@ tr:is(:last-child) td {
             </div>
         </div>
     </footer>
-</body>
 
-<script>
-    const transactionKey = 'transactions'; // Key for localStorage
-const ctx = document.getElementById('myDonutChart').getContext('2d');
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-analytics.js";
+        import { getDatabase, ref, push, set, onValue, remove } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-database.js";
 
-// Initial Chart Data
-const categories = ['Groceries', 'Rent and Bills', 'Supplies', 'Entertainment', 'Eat Out','Others'];
-const chartData = [0, 0, 0, 0, 0];  // Initial data (values for each category)
-const myDonutChart = new Chart(ctx, {
-    type: 'doughnut',
-    data: {
-        labels: categories,
-        datasets: [{
-            label: 'Expenses by Category',
-            data: chartData,
-            backgroundColor: [
+        // Firebase config - replace with your own if needed
+        const firebaseConfig = {
+            apiKey: "AIzaSyC_zBxZ7J1tQMUJWGOSB4wVKcFwEtfbZts",
+            authDomain: "mybudget-11d45.firebaseapp.com",
+            projectId: "mybudget-11d45",
+            storageBucket: "mybudget-11d45.firebasestorage.app",
+            messagingSenderId: "883252995975",
+            appId: "1:883252995975:web:d2d87202b428e9e5ed9522",
+            measurementId: "G-6WXSPFE95B"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const database = getDatabase(app);
+
+        // Categories & chart data
+        const categories = ['Groceries', 'Rent and Bills', 'Supplies', 'Entertainment', 'Eat Out', 'Others'];
+        const chartData = [0, 0, 0, 0, 0, 0];
+
+        // Chart.js donut chart setup
+        const ctx = document.getElementById('myDonutChart').getContext('2d');
+        const myDonutChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: categories,
+                datasets: [{
+                    label: 'Expenses by Category',
+                    data: chartData,
+                    backgroundColor: [
                         'rgba(255, 99, 132, 0.2)',
                         'rgba(54, 162, 235, 0.2)',
                         'rgba(255, 206, 86, 0.2)',
@@ -190,256 +212,226 @@ const myDonutChart = new Chart(ctx, {
                         'rgba(153, 102, 255, 1)',
                         'rgba(255, 159, 64, 1)',
                     ],
-            borderWidth: 1
-        }]
-    },
-    options: {
-        responsive: true,
-        aspectRatio: 2,
-        plugins: {
-            legend: {
-                position: 'right',
+                    borderWidth: 1
+                }]
             },
-            tooltip: {
-                callbacks: {
-                    label: function(context) {
-                        let label = context.label || '';
-                        if (label) {
-                            label += ': ';
+            options: {
+                responsive: true,
+                aspectRatio: 2,
+                plugins: {
+                    legend: { position: 'right' },
+                    tooltip: {
+                        callbacks: {
+                            label: ctx => {
+                                let label = ctx.label || '';
+                                if (label) label += ': ';
+                                if (ctx.parsed !== null) label += "$" + ctx.parsed.toFixed(2);
+                                return label;
+                            }
                         }
-                        if (context.parsed !== null) {
-                            label += "$" + context.parsed.toFixed(2);
-                        }
-                        return label;
                     }
                 }
+            },
+        });
+
+        // Load transactions from Firebase and listen for changes
+        function loadTransactions() {
+            const table = document.querySelector("table");
+            const transactionsRef = ref(database, 'transactions');
+
+            onValue(transactionsRef, (snapshot) => {
+                const data = snapshot.val() || {};
+                const transactions = Object.entries(data).map(([id, val]) => ({ id, ...val }));
+
+                // Clear existing table rows except header
+                [...table.rows].slice(1).forEach(row => row.remove());
+
+                transactions.forEach(t => addTransactionToTable(t));
+                updateTotals(transactions);
+            });
+        }
+
+        // Save transaction to Firebase
+        async function saveTransaction(transaction) {
+            try {
+                const transactionsRef = ref(database, 'transactions');
+                const newTransactionRef = push(transactionsRef);
+                await set(newTransactionRef, transaction);
+                return { id: newTransactionRef.key, ...transaction };
+            } catch (error) {
+                console.error('Error saving transaction:', error);
+                alert("Error saving transaction.");
+                throw error;
             }
         }
-    },
-});
 
-// Load transactions from localStorage when the page is loaded
-function loadTransactions() {
-    const savedTransactions = JSON.parse(localStorage.getItem(transactionKey)) || [];
-    savedTransactions.forEach(transaction => {
-        addTransactionToTable(transaction);
-    });
-    updateTotals(savedTransactions);
-}
-
-// Save transactions to localStorage
-function saveTransactions(transactions) {
-    localStorage.setItem(transactionKey, JSON.stringify(transactions));
-}
-
-function updateTotals(transactions) {
-     let totalExpenses = 0;
-     let categoryTotals = { Groceries: 0, "Rent and Bills": 0, Supplies: 0, Entertainment: 0, "Eat Out": 0, Others: 0 };
-
-     transactions.forEach(transaction => {
-         let category = transaction.category;
-         if (!categoryTotals.hasOwnProperty(category)) {
-             category = "Others"; // Any non-listed category goes to "Other"
-         }
-         totalExpenses += parseFloat(transaction.amount);
-         categoryTotals[category] = (categoryTotals[category] || 0) + parseFloat(transaction.amount);
-     });
-
-     // Update the HTML content
-     document.querySelector('.transaction p:first-child').textContent = `Total Expenses: $${totalExpenses.toFixed(2)}`;
-     let categoryHtml = '';
-     for (let category in categoryTotals) {
-         categoryHtml += `<p>${category}: $${categoryTotals[category].toFixed(2)}</p>`;
-     }
-     document.querySelector('.transaction p:last-child').innerHTML = categoryHtml;
-
-     // Update chart data
-     categories.forEach((category, index) => {
-         chartData[index] = categoryTotals[category] || 0;
-     });
-
-     myDonutChart.update();
- }
-
-
-const predefinedCategories = ["Food", "Transport", "Shopping", "Bills", "Entertainment","Others"];
-
-function processCategory(inputCategory) {
-    // Only return predefined categories, otherwise return the custom category.
-    if (inputCategory === "Others") {
-        let customCategory = document.getElementById("custom-category").value;
-        return customCategory || "Others";  // Use custom category if provided
-    }
-    return predefinedCategories.includes(inputCategory) ? inputCategory : "Others";
-}
-
-function updateChart(transactions) {
-    let categoryTotals = {};
-
-    transactions.forEach(transaction => {
-        let processedCategory = processCategory(transaction.category);
-
-        if (!categoryTotals[processedCategory]) {
-            categoryTotals[processedCategory] = 0;
+        // Delete transaction by id from Firebase
+        async function deleteTransaction(id) {
+            try {
+                const transactionRef = ref(database, `transactions/${id}`);
+                await remove(transactionRef);
+            } catch (error) {
+                console.error('Error deleting transaction:', error);
+                alert("Error deleting transaction.");
+            }
         }
-        categoryTotals[processedCategory] += parseFloat(transaction.amount);
-    });
 
-    let chartLabels = Object.keys(categoryTotals);
-    let chartData = chartLabels.map(cat => categoryTotals[cat]);
+        // Update total and category sums + chart
+        function updateTotals(transactions) {
+            let totalExpenses = 0;
+            let categoryTotals = { Groceries: 0, "Rent and Bills": 0, Supplies: 0, Entertainment: 0, "Eat Out": 0, Others: 0 };
 
-    let ctx = document.getElementById("donut-chart").getContext("2d");
-
-    if (window.myChart) {
-        window.myChart.destroy();
-    }
-
-    window.myChart = new Chart(ctx, {
-        type: "doughnut",
-        data: {
-            labels: chartLabels, // Includes "Other"
-            datasets: [{
-                data: chartData,
-                backgroundColor: ["#ff6384", "#36a2eb", "#ffce56", "#4bc0c0", "#9966ff", "#aaaaaa"], // Adjust colors
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: {
-                    display: true,
-                    position: "bottom"
+            transactions.forEach(transaction => {
+                let category = transaction.category;
+                if (!categoryTotals.hasOwnProperty(category)) {
+                    category = "Others";
                 }
+                totalExpenses += parseFloat(transaction.amount);
+                categoryTotals[category] = (categoryTotals[category] || 0) + parseFloat(transaction.amount);
+            });
+
+            document.querySelector('.transaction p:first-child').textContent = `Total Expenses: $${totalExpenses.toFixed(2)}`;
+
+            let categoryHtml = '';
+            for (let category in categoryTotals) {
+                categoryHtml += `<p>${category}: $${categoryTotals[category].toFixed(2)}</p>`;
             }
+            document.querySelector('.transaction p:last-child').innerHTML = categoryHtml;
+
+            categories.forEach((category, index) => {
+                chartData[index] = categoryTotals[category] || 0;
+            });
+
+            myDonutChart.update();
         }
-    });
-}
 
+        // Process category input, handle custom 'Others'
+        const predefinedCategories = ["Groceries", "Rent and Bills", "Supplies", "Entertainment", "Eat Out", "Others"];
+        function processCategory(inputCategory) {
+            if (inputCategory === "Others") {
+                let customCategory = document.getElementById("custom-category").value.trim();
+                return customCategory || "Others";
+            }
+            return predefinedCategories.includes(inputCategory) ? inputCategory : "Others";
+        }
 
-// Add transaction to the table
-function addTransactionToTable(transaction) {
-    let table = document.querySelector("table");
+        // Add transaction row to table with modify & delete buttons
+        function addTransactionToTable(transaction) {
+            let table = document.querySelector("table");
 
-    let newRow = table.insertRow(-1);
-    let dateCell = newRow.insertCell(0);
-    let categoryCell = newRow.insertCell(1);
-    let amountCell = newRow.insertCell(2);
-    let actionCell = newRow.insertCell(3);
+            let newRow = table.insertRow(-1);
+            newRow.dataset.id = transaction.id || '';
 
-    dateCell.textContent = transaction.date;
-    categoryCell.textContent = transaction.category;
-    amountCell.textContent = `$${parseFloat(transaction.amount).toFixed(2)}`;
+            let dateCell = newRow.insertCell(0);
+            let categoryCell = newRow.insertCell(1);
+            let amountCell = newRow.insertCell(2);
+            let actionCell = newRow.insertCell(3);
 
-    // Modify button
-    let modifyBtn = document.createElement("button");
-    modifyBtn.textContent = "Modify";
-    modifyBtn.classList.add("modify-btn");
-    actionCell.appendChild(modifyBtn);
+            dateCell.textContent = transaction.date;
+            categoryCell.textContent = transaction.category;
+            amountCell.textContent = `$${parseFloat(transaction.amount).toFixed(2)}`;
 
-    // Modify button click event
-    modifyBtn.addEventListener("click", function() {
-        document.getElementById("transaction-date").value = transaction.date;
-        document.getElementById("transaction-category").value = transaction.category;
-        document.getElementById("transaction-amount").value = transaction.amount;
-        
-        // Show modal
-        document.getElementById("add-modal").style.display = "block";
+            // Modify button
+            let modifyBtn = document.createElement("button");
+            modifyBtn.textContent = "Modify";
+            modifyBtn.classList.add("modify-btn");
+            actionCell.appendChild(modifyBtn);
 
-        // Remove the old transaction from storage and table
-        deleteTransaction(transaction, newRow);
-    });
+            modifyBtn.addEventListener("click", async () => {
+                document.getElementById("transaction-date").value = transaction.date;
+                document.getElementById("transaction-category").value = transaction.category;
+                document.getElementById("transaction-amount").value = transaction.amount;
 
-    //Delete button
-    let deleteBtn = document.createElement("button");
-    deleteBtn.textContent = "Delete";
-    deleteBtn.classList.add("delete-btn");
-    actionCell.appendChild(deleteBtn);
+                if (transaction.category === "Others") {
+                    document.getElementById("custom-category").style.display = "block";
+                    document.getElementById("custom-category").value = transaction.category;
+                    document.getElementById("custom-category").required = true;
+                } else {
+                    document.getElementById("custom-category").style.display = "none";
+                    document.getElementById("custom-category").required = false;
+                    document.getElementById("custom-category").value = "";
+                }
 
-    deleteBtn.addEventListener("click", function() {
-        newRow.remove();
-        let transactions = JSON.parse(localStorage.getItem(transactionKey)) || [];
-        transactions = transactions.filter(t => t.date !== transaction.date || t.category !== transaction.category || t.amount !== transaction.amount);
-        saveTransactions(transactions);
-        updateTotals(transactions);
-    });
-}
-document.getElementById("save-transaction").addEventListener("click", async function () {
-    const date = document.getElementById("transaction-date").value;
-    const category = document.getElementById("transaction-category").value;
-    const amount = parseFloat(document.getElementById("transaction-amount").value);
+                // Show modal
+                document.getElementById("add-modal").style.display = "block";
 
-    if (!date || !category || isNaN(amount)) {
-        alert("Please enter valid transaction details.");
-        return;
-    }
+                // Delete old transaction before editing
+                if (newRow.dataset.id) {
+                    await deleteTransaction(newRow.dataset.id);
+                    newRow.remove();
+                }
+            });
 
-    const transaction = { date, category, amount };
+            // Delete button
+            let deleteBtn = document.createElement("button");
+            deleteBtn.textContent = "Delete";
+            deleteBtn.classList.add("delete-btn");
+            actionCell.appendChild(deleteBtn);
 
-    try {
-        const response = await fetch("http://localhost:3000/api/transactions", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(transaction),
+            deleteBtn.addEventListener("click", async () => {
+                if (newRow.dataset.id) {
+                    await deleteTransaction(newRow.dataset.id);
+                    newRow.remove();
+                }
+            });
+        }
+
+        // Save button click handler
+        document.getElementById("save-transaction").addEventListener("click", async () => {
+            const date = document.getElementById("transaction-date").value;
+            const categoryInput = document.getElementById("transaction-category").value;
+            const category = processCategory(categoryInput);
+            const amount = parseFloat(document.getElementById("transaction-amount").value);
+
+            if (!date || !category || isNaN(amount)) {
+                alert("Please enter valid transaction details.");
+                return;
+            }
+
+            const transaction = { date, category, amount };
+
+            try {
+                await saveTransaction(transaction);
+                alert("Transaction saved!");
+                document.getElementById("add-modal").style.display = "none";
+                // No need to call loadTransactions because onValue auto updates UI
+            } catch {
+                // error handled in saveTransaction()
+            }
         });
 
-        if (response.ok) {
-            alert("Transaction saved!");
-            // Save to local storage
-            const transactions = JSON.parse(localStorage.getItem(transactionKey)) || [];
-            transactions.push(transaction);
-            saveTransactions(transactions); // Save to local storage
-            addTransactionToTable(transaction); // Add to the table
-            updateTotals(transactions); // Update totals
-            modal.style.display = "none"; // Close the modal
-        } else {
-            alert("Failed to save transaction.");
-        }
-    } catch (error) {
-        console.error("Error:", error);
-        alert("Error saving transaction.");
-    }
-});
+        // Modal open/close handlers
+        const modal = document.getElementById("add-modal");
+        const btn = document.getElementById("AddData");
+        const span = document.getElementsByClassName("close")[0];
 
-// Open and close the modal
-var modal = document.getElementById("add-modal");
-var btn = document.getElementById("AddData");
-var span = document.getElementsByClassName("close")[0];
+        btn.onclick = () => modal.style.display = "block";
+        span.onclick = () => modal.style.display = "none";
 
-btn.onclick = function() {
-    modal.style.display = "block";
-};
+        window.onclick = (event) => {
+            if (event.target === modal) {
+                modal.style.display = "none";
+            }
+        };
 
-span.onclick = function() {
-    modal.style.display = "none";
-};
+        // Show/hide custom category input field based on selection
+        document.getElementById("transaction-category").addEventListener("change", function () {
+            let customCategoryInput = document.getElementById("custom-category");
 
-window.onclick = function(event) {
-    if (event.target == modal) {
-        modal.style.display = "none";
-    }
-};
-
-document.addEventListener("DOMContentLoaded", function() {
-    loadTransactions();
-    document.querySelectorAll(".delete-btn").forEach(button => {
-        button.addEventListener("click", function() {
-            this.parentElement.parentElement.remove(); // Deletes the row
+            if (this.value === "Others") {
+                customCategoryInput.style.display = "block";
+                customCategoryInput.required = true;
+            } else {
+                customCategoryInput.style.display = "none";
+                customCategoryInput.required = false;
+                customCategoryInput.value = "";
+            }
         });
-    });
-});
 
-document.getElementById("transaction-category").addEventListener("change", function() {
-    let customCategoryInput = document.getElementById("custom-category");
-    
-    if (this.value === "Others") {
-        customCategoryInput.style.display = "block"; // Show input field
-        customCategoryInput.required = true; // Make it required
-    } else {
-        customCategoryInput.style.display = "none"; // Hide input field
-        customCategoryInput.required = false; // Remove requirement
-        customCategoryInput.value = ""; // Clear input field
-    }
-});
+        // Load transactions initially
+        document.addEventListener("DOMContentLoaded", loadTransactions);
+    </script>
 
-</script>
+</body>
+
 </html>
