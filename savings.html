@@ -30,14 +30,15 @@ body {
 
 .right-sidebar {
     flex: 1; /* Takes less space */
-    width: 200px;
+    display: flex;
+    flex-direction: column;
+    width: 220px;
     background: white;
     padding: 20px;
+    padding-top: 10px;
     border-radius: 8px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    height: auto;
-    margin: 10px auto;
-    
+    margin: auto;
 }
 
 .right-sidebar p {
@@ -136,10 +137,9 @@ body {
                 <div id="sidebar" class="sidebar">
                     <ul>
                         <li><a href="index.html" class="nav-option">Home</a></li>
-                        <li><a href="#wallet" class="nav-option">Wallet</a></li>
-                        <li><a href="#transaction" class="nav-option">Expenses</a></li>
-                        <li><a href="#saving" class="nav-option">Savings</a></li>
-                        <li><a href="#summary" class="nav-option">Summary</a></li>
+                        <li><a href="wallet.html" class="nav-option">Wallet</a></li>
+                        <li><a href="expenses.html" class="nav-option">Expenses</a></li>
+                        <li><a href="#savings.html" class="nav-option">Savings</a></li>
                     </ul>
                 </div>
 
@@ -217,8 +217,8 @@ body {
 
         <!-- Right Sidebar (New Dashboard) -->
         <div class="right-sidebar">
-            <h2>Goals:<span id="total-goal">$0.00</span</h2>
-            <p>Current savings: <span id="total-deposit">$0.00</span> </p>
+            <h2>Goals:<span id="total-goal">$0.00</span></h2>
+            <p>Current savings: <span id="current-savings">$0.00</span> </p>
             <p>To save: <span id="to-save">$0.00</span></p>
             
             <div class="goals-box">
@@ -229,7 +229,7 @@ body {
                     <input type="number" id="goal-amount" placeholder="$ 0.00">
                     <button id="save-goal">Save Goal</button>
                 </div>
-
+              <div class="goals-list"></div>
             </div>
         </div>
     </div>
@@ -245,192 +245,128 @@ body {
             </div>
         </div>
     </footer>
-</body>
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const labels = ['Jan', 'Feb', 'March', 'April', 'May', 'June', 
-                        'July', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    
-        function getDeposits() {
-            return JSON.parse(localStorage.getItem("deposit")) || [];
-        }
-    
-        function getMonthlyDeposits() {
-            let monthlyTotals = new Array(12).fill(0);
-            getDeposits().forEach(({ date, amount }) => {
-                const monthIndex = new Date(date).getMonth();
-                monthlyTotals[monthIndex] += parseFloat(amount);
-            });
-            return monthlyTotals;
-        }
-    
-        function getTotalDeposit() {
-            return getDeposits().reduce((sum, { amount }) => sum + parseFloat(amount), 0);
-        }
-    
-        function updateTotalDeposit() {
-            document.getElementById("total-deposit").textContent = `$${getTotalDeposit().toFixed(2)}`;
-        }
-    
-        let ctx = document.getElementById('SavingsLineChart').getContext('2d');
-        let myLineChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: 'Deposit Amount',
-                    data: getMonthlyDeposits(),
-                    borderColor: 'blue',
-                    borderWidth: 2,
-                    fill: false,
-                }],
-            },
-            options: {
-                responsive: true,
-                scales: {
-                    x: { title: { display: true, text: 'Months', font: { size: 20, weight: 'bold', family: 'Arial' }, color: 'darkblue' } },
-                    y: { title: { display: true, text: 'Amount ($)', font: { size: 20, weight: 'bold', family: 'Arial' }, color: 'darkblue' }, beginAtZero: true }
-                }
-            }
-        });
-    
-        function updateChart() {
-            myLineChart.data.datasets[0].data = getMonthlyDeposits();
-            myLineChart.update();
-            updateTotalDeposit();
-        }
-    
-        document.getElementById("save-deposit").addEventListener("click", function () {
-            setTimeout(updateChart, 100);
-        });
-    
-        updateChart();
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
+    import {
+      getDatabase, ref, push, get, remove, set
+    } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-database.js";
+
+    // 🔧 Firebase config
+    const firebaseConfig = {
+      apiKey: "AIzaSyC_zBxZ7J1tQMUJWGOSB4wVKcFwEtfbZts",
+      authDomain: "mybudget-11d45.firebaseapp.com",
+      projectId: "mybudget-11d45",
+      storageBucket: "mybudget-11d45.firebasestorage.app",
+      messagingSenderId: "883252995975",
+      appId: "1:883252995975:web:d2d87202b428e9e5ed9522",
+      measurementId: "G-6WXSPFE95B",
+      databaseURL: "https://mybudget-11d45-default-rtdb.firebaseio.com/"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    const labels = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const ctx = document.getElementById('SavingsLineChart').getContext('2d');
+    const chart = new Chart(ctx, {
+      type: 'line',
+      data: { labels, datasets: [{ label: 'Deposit Amount', data: new Array(12).fill(0), borderColor: 'blue', borderWidth: 2, fill: false }] },
+      options: { responsive: true, scales: { y: { beginAtZero: true } } }
     });
-    </script>
-    
 
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const addButton = document.getElementById("AddData");
-        const modal = document.getElementById("add-modal");
-        const closeModal = document.querySelector(".close");
-        const saveButton = document.getElementById("save-deposit");
-        const depositDate = document.getElementById("deposit-date");
-        const depositAmount = document.getElementById("deposit-amount");
-        const table = document.querySelector(".dashboard.deposit table");
-    
-        // Open modal
-        addButton.addEventListener("click", function () {
-            modal.style.display = "block";
-        });
-    
-        // Close modal
-        closeModal.addEventListener("click", function () {
-            modal.style.display = "none";
-        });
-    
-        // Save deposit
-        saveButton.addEventListener("click", function () {
-            const date = depositDate.value;
-            const amount = parseFloat(depositAmount.value).toFixed(2);
-    
-            if (!date || isNaN(amount)) return;
-    
-            const deposits = JSON.parse(localStorage.getItem("deposit")) || [];
-            deposits.push({ date, amount });
-            localStorage.setItem("deposit", JSON.stringify(deposits));
-    
-            addDepositToTable(date, amount);
-            depositDate.value = "";
-            depositAmount.value = "";
-            modal.style.display = "none";
-        });
-    
-        // Function to add a row to the table
-        function addDepositToTable(date, amount) {
-            const row = table.insertRow(-1);
-            row.innerHTML = `
-                <td>${date}</td>
-                <td>$${amount}</td>
-                <td><button class="delete-btn">Delete</button></td>
-            `;
-    
-            // Delete functionality
-            row.querySelector(".delete-btn").addEventListener("click", function () {
-                row.remove();
-                removeDeposit(date, amount);
-            });
-        }
-    
-        // Remove deposit from localStorage
-        function removeDeposit(date, amount) {
-            let deposits = JSON.parse(localStorage.getItem("deposit")) || [];
-            deposits = deposits.filter(d => !(d.date === date && d.amount === amount));
-            localStorage.setItem("deposit", JSON.stringify(deposits));
-        }
-    
-        // Load existing deposits on page load
-        function loadDeposits() {
-            const deposits = JSON.parse(localStorage.getItem("deposit")) || [];
-            deposits.forEach(({ date, amount }) => addDepositToTable(date, amount));
-        }
-    
-        loadDeposits();
-
-        function calculateSavingsLeft() {
-        const goal = parseFloat(document.querySelector("#total-goal").textContent.replace(/[$,]/g, '')) || 0;
-        const curr_savings = parseFloat(document.querySelector("total-deposit").textContent.replace(/[$,]/g, '')) || 0;
-        document.querySelector("#to-save").textContent = `$${(goal-curr_savings).toFixed(2)}`;
+    // —Deposits—
+    async function saveDeposit(date, amount) {
+      await push(ref(db, 'deposits'), { date, amount });
+    }
+    async function loadDeposits() {
+      const snap = await get(ref(db, 'deposits'));
+      if (!snap.exists()) return [];
+      return Object.entries(snap.val()).map(([key, { date, amount }]) => ({ key, date, amount: parseFloat(amount) }));
     }
 
-    });
+    // —Goals—
+    async function saveGoal(name, amount) {
+      await push(ref(db, 'goals'), { name, amount });
+    }
+    async function loadGoals() {
+      const snap = await get(ref(db, 'goals'));
+      if (!snap.exists()) return [];
+      return Object.entries(snap.val()).map(([key, { name, amount }]) => ({ key, name, amount: parseFloat(amount) }));
+    }
 
-    document.addEventListener("DOMContentLoaded", function () {
-    const saveButton = document.getElementById("save-goal");
-    const goalNameInput = document.getElementById("goal-name");
-    const goalAmountInput = document.getElementById("goal-amount");
-    const goalsBox = document.querySelector(".goals-box");
+    // —Update UI—
+    async function refreshUI() {
+      const deposits = await loadDeposits();
+      const goals = await loadGoals();
 
-    let totalGoal = 0; // Track total goal amount
+      // Update deposits table/chart
+      const table = document.querySelector('.dashboard.deposit table');
+      table.querySelectorAll('tr:not(:first-child)').forEach(r => r.remove());
+      const monthly = new Array(12).fill(0);
+      let total = 0;
 
-    saveButton.addEventListener("click", function () {
-        let goalName = goalNameInput.value.trim();
-        let goalAmount = parseFloat(goalAmountInput.value) || 0;
+      deposits.forEach(d => {
+        monthly[new Date(d.date).getMonth()] += d.amount;
+        total += d.amount;
+        const row = table.insertRow();
+        row.innerHTML = `<td>${d.date}</td><td>$${d.amount.toFixed(2)}</td><td><button data-key="${d.key}">Delete</button></td>`;
+        row.querySelector('button').onclick = async () => {
+          await remove(ref(db, 'deposits/' + d.key));
+          refreshUI();
+        };
+      });
+      chart.data.datasets[0].data = monthly;
+      chart.update();
+      document.getElementById('total-deposit').textContent = `$${total.toFixed(2)}`;
+      document.getElementById('current-savings').textContent = `$${total.toFixed(2)}`;
 
-        if (!goalName || goalAmount <= 0) {
-            alert("Please enter a valid goal name and amount.");
-            return;
-        }
+      // Update goals list
+      document.querySelector('.goals-list').innerHTML = '';
+      let goalTotal = 0;
+      goals.forEach(g => {
+        goalTotal += g.amount;
+        const div = document.createElement('div');
+        div.innerHTML = `<span>${g.name}: $${g.amount.toFixed(2)}</span>
+                         <button data-key="${g.key}">Delete</button>`;
+        div.querySelector('button').onclick = async () => {
+          await remove(ref(db, 'goals/' + g.key));
+          refreshUI();
+        };
+        document.querySelector('.goals-list').append(div);
+      });
+      document.getElementById('total-goal').textContent = `$${goalTotal.toFixed(2)}`;
+      document.getElementById('to-save').textContent = `$${(goalTotal - total).toFixed(2)}`;
+    }
 
-        // Check if we are editing an existing goal
-        if (saveButton.textContent === "Edit Goal") {
-            const existingGoal = document.querySelector(".goal-entry");
-            existingGoal.querySelector(".goal-name").textContent = goalName;
-            existingGoal.querySelector(".goal-amount").textContent = `$ ${goalAmount.toFixed(2)}`;
-        } else {
-            // Create new goal entry
-            const goalEntry = document.createElement("div");
-            goalEntry.classList.add("goal-entry");
-            goalEntry.innerHTML = `
-                <p><strong class="goal-name">${goalName}</strong></p>
-                <p>Amount: <span class="goal-amount">$ ${goalAmount.toFixed(2)}</span></p>
-            `;
+    // —Modal & Form Events—
+    document.getElementById('AddData').onclick = () => document.getElementById('add-modal').style.display = 'block';
+    document.querySelector('.close').onclick = () => document.getElementById('add-modal').style.display = 'none';
 
-            goalsBox.appendChild(goalEntry);
-            totalGoal += goalAmount;
-        }
+    document.getElementById('save-deposit').onclick = async () => {
+      const date = document.getElementById('deposit-date').value;
+      const amount = parseFloat(document.getElementById('deposit-amount').value).toFixed(2);
+      if (date && !isNaN(amount)) {
+        await saveDeposit(date, amount);
+        document.getElementById('deposit-date').value = '';
+        document.getElementById('deposit-amount').value = '';
+        document.getElementById('add-modal').style.display = 'none';
+        refreshUI();
+      }
+    };
 
-        // Change button to "Edit Goal"
-        saveButton.textContent = "Edit Goal";
-    });
-});
+    document.getElementById('save-goal').onclick = async () => {
+      const name = document.getElementById('goal-name').value.trim();
+      const amount = parseFloat(document.getElementById('goal-amount').value);
+      if (name && amount > 0) {
+        await saveGoal(name, amount);
+        document.getElementById('goal-name').value = '';
+        document.getElementById('goal-amount').value = '';
+        refreshUI();
+      }
+    };
 
-
-
-
-    </script>
-    
-
-
-
+    // —Initial load—
+    refreshUI();
+  </script>
+</body>
 </html>
